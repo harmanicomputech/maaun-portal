@@ -14,6 +14,7 @@ import activityLogsRouter from "./activity-logs";
 import academicStandingRouter from "./academic-standing";
 import transcriptsRouter from "./transcripts";
 import financialRouter from "./financial";
+import timetableRouter from "./timetable";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(activityLogsRouter);
 router.use(academicStandingRouter);
 router.use(transcriptsRouter);
 router.use(financialRouter);
+router.use(timetableRouter);
 
 export default router;

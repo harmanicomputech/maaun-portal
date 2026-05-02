@@ -20,12 +20,14 @@ import StudentPayments from "@/pages/student/payments";
 import StudentNotifications from "@/pages/student/notifications";
 import StudentAcademicStanding from "@/pages/student/academic-standing";
 import StudentReceipts from "@/pages/student/receipts";
+import StudentTimetable from "@/pages/student/timetable";
 
 import LecturerDashboard from "@/pages/lecturer/dashboard";
 import LecturerCourses from "@/pages/lecturer/courses";
 import LecturerStudents from "@/pages/lecturer/students";
 import LecturerResults from "@/pages/lecturer/results";
 import LecturerTranscript from "@/pages/lecturer/transcript";
+import LecturerTimetable from "@/pages/lecturer/timetable";
 
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminCourses from "@/pages/admin/courses";
@@ -39,6 +41,7 @@ import AdminActivityLogs from "@/pages/admin/activity-logs";
 import AdminAcademicStanding from "@/pages/admin/academic-standing";
 import AdminTranscripts from "@/pages/admin/transcripts";
 import AdminFinance from "@/pages/admin/finance";
+import AdminTimetable from "@/pages/admin/timetable";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +67,7 @@ function Router() {
       <Route path="/student/profile"><AppLayout><StudentProfile /></AppLayout></Route>
       <Route path="/student/payments"><AppLayout><StudentPayments /></AppLayout></Route>
       <Route path="/student/receipts"><AppLayout><StudentReceipts /></AppLayout></Route>
+      <Route path="/student/timetable"><AppLayout><StudentTimetable /></AppLayout></Route>
       <Route path="/student/notifications"><AppLayout><StudentNotifications /></AppLayout></Route>
       <Route path="/student/academic-standing"><AppLayout><StudentAcademicStanding /></AppLayout></Route>
 
@@ -73,6 +77,7 @@ function Router() {
       <Route path="/lecturer/students"><AppLayout><LecturerStudents /></AppLayout></Route>
       <Route path="/lecturer/results"><AppLayout><LecturerResults /></AppLayout></Route>
       <Route path="/lecturer/transcript"><AppLayout><LecturerTranscript /></AppLayout></Route>
+      <Route path="/lecturer/timetable"><AppLayout><LecturerTimetable /></AppLayout></Route>
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard"><AppLayout><AdminDashboard /></AppLayout></Route>
@@ -87,6 +92,7 @@ function Router() {
       <Route path="/admin/academic-standing"><AppLayout><AdminAcademicStanding /></AppLayout></Route>
       <Route path="/admin/transcripts"><AppLayout><AdminTranscripts /></AppLayout></Route>
       <Route path="/admin/finance"><AppLayout><AdminFinance /></AppLayout></Route>
+      <Route path="/admin/timetable"><AppLayout><AdminTimetable /></AppLayout></Route>
 
       <Route path="/">
         <AppLayout>

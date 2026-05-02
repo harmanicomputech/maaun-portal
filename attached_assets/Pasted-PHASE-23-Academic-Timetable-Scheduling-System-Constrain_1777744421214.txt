@@ -1,0 +1,132 @@
+PHASE 23: Academic Timetable & Scheduling System (Constraint-Based)
+
+OBJECTIVE:
+Build a full academic timetable system that assigns courses to time slots, lecturers, and venues with conflict prevention and student auto-generation.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: venues
+- id
+- name (e.g. Lecture Hall A)
+- capacity
+- location
+
+Create table: timetables
+- id
+- course_id (FK)
+- lecturer_id (FK)
+- venue_id (FK)
+- day_of_week (Mon–Fri)
+- start_time
+- end_time
+- session_id
+- semester_id
+
+--------------------------------------------------
+2. CONSTRAINT ENGINE (CRITICAL)
+--------------------------------------------------
+
+Before saving timetable entry, validate:
+
+1. Lecturer conflict:
+   - Same lecturer cannot have overlapping classes
+
+2. Venue conflict:
+   - Same venue cannot be double-booked
+
+3. Course conflict:
+   - Same course cannot appear twice in same semester schedule
+
+If conflict exists → reject with explanation
+
+--------------------------------------------------
+3. LECTURER FEATURES
+--------------------------------------------------
+
+Page: /lecturer/timetable
+
+- Create class schedule for assigned courses
+- Select:
+  - course
+  - venue
+  - day
+  - time slot
+
+- View personal weekly timetable (calendar view)
+
+--------------------------------------------------
+4. STUDENT FEATURES
+--------------------------------------------------
+
+Page: /student/timetable
+
+- Auto-generated from enrolled courses
+- Weekly grid view:
+  Monday → Friday
+  Time slots grouped
+
+- Shows:
+  course name
+  lecturer
+  venue
+  time
+
+--------------------------------------------------
+5. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/timetable
+
+- Full timetable overview
+- Filter by:
+  - department
+  - lecturer
+  - venue
+- Conflict detection dashboard (highlight clashes)
+- Override ability (admin-only)
+
+--------------------------------------------------
+6. UI REQUIREMENTS
+--------------------------------------------------
+
+- Weekly calendar layout (grid-based)
+- Color-coded courses per department
+- Hover tooltip:
+  - lecturer name
+  - venue
+  - course code
+
+Use Tailwind + Alpine.js for interactivity
+
+--------------------------------------------------
+7. AUTO TIMETABLE GENERATION (OPTIONAL ADVANCED)
+
+Admin can:
+- Auto-generate timetable based on:
+  - course load
+  - lecturer availability
+  - venue capacity
+
+--------------------------------------------------
+8. INTEGRATION RULES
+
+Must integrate with:
+- Course system
+- Lecturer assignments
+- Enrollment system
+- Session & semester system
+
+--------------------------------------------------
+9. NOTIFICATIONS
+
+Trigger:
+- New timetable published → notify students + lecturers
+
+--------------------------------------------------
+10. VALIDATION RULES
+
+- No overlapping schedules
+- No invalid time ranges
+- End time must be after start time
