@@ -4,7 +4,7 @@ import {
   db, studentsTable, usersTable, resultsTable, coursesTable,
   academicStandingsTable, transcriptsTable, receiptsTable,
   financialLedgerTable, graduationClearancesTable, graduationApplicationsTable,
-  activityLogsTable, academicSessionsTable,
+  activityLogsTable, academicSessionsTable, disciplinaryFlagsTable,
 } from "@workspace/db";
 import { requireAuth, requireRole } from "../lib/auth-middleware";
 import { createNotification } from "../lib/notification-helper";
@@ -102,6 +102,21 @@ async function evaluateStudent(studentId: number) {
     adminRemarks.push("No official transcript issued — pending registrar approval");
   } else {
     adminRemarks.push(`Official transcript issued (Ref: ${officialTranscript[0].referenceNumber})`);
+  }
+
+  // ── Disciplinary flag check ───────────────────────────────────────────────
+  const [gradBlock] = await db.select()
+    .from(disciplinaryFlagsTable)
+    .where(and(
+      eq(disciplinaryFlagsTable.studentId, studentId),
+      eq(disciplinaryFlagsTable.flagType, "graduation_block"),
+      eq(disciplinaryFlagsTable.active, true),
+    ))
+    .limit(1);
+
+  if (gradBlock) {
+    adminOk = false;
+    adminRemarks.push("Active disciplinary graduation block — contact Dean of Students to resolve");
   }
 
   const overallStatus = academicOk && financialOk && adminOk ? "eligible" : "not_eligible";

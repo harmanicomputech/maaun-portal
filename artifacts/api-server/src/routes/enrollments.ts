@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { eq, and } from "drizzle-orm";
-import { db, enrollmentsTable, coursesTable, studentsTable, lecturersTable, usersTable } from "@workspace/db";
+import { db, enrollmentsTable, coursesTable, studentsTable, lecturersTable, usersTable, disciplinaryFlagsTable } from "@workspace/db";
 import { EnrollCourseBody } from "@workspace/api-zod";
 import { requireAuth, AuthRequest } from "../lib/auth-middleware";
 
@@ -62,6 +62,20 @@ router.post("/enrollments", requireAuth, async (req: AuthRequest, res) => {
   const [student] = await db.select().from(studentsTable).where(eq(studentsTable.userId, req.user!.userId)).limit(1);
   if (!student) {
     return res.status(403).json({ error: "Not a student", message: "Only students can enroll in courses." });
+  }
+
+  // Disciplinary academic hold check
+  const [academicHold] = await db.select()
+    .from(disciplinaryFlagsTable)
+    .where(and(
+      eq(disciplinaryFlagsTable.studentId, student.id),
+      eq(disciplinaryFlagsTable.flagType, "academic_hold"),
+      eq(disciplinaryFlagsTable.active, true),
+    ))
+    .limit(1);
+
+  if (academicHold) {
+    return res.status(403).json({ error: "Academic hold", message: "Course registration is blocked due to an active disciplinary sanction. Contact the Dean of Students office." });
   }
 
   // Check duplicate

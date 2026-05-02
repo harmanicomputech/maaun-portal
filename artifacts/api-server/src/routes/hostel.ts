@@ -5,7 +5,7 @@ import {
   academicStandingsTable, receiptsTable,
   hostelsTable, roomsTable, bedSpacesTable,
   hostelApplicationsTable, hostelAllocationsTable,
-  activityLogsTable, academicSessionsTable,
+  activityLogsTable, academicSessionsTable, disciplinaryFlagsTable,
 } from "@workspace/db";
 import { requireAuth, requireRole } from "../lib/auth-middleware";
 import { createNotification } from "../lib/notification-helper";
@@ -27,6 +27,20 @@ async function checkHostelEligibility(studentId: number) {
   if (!standing) return { eligible: false, reason: "No academic standing record found. Please contact the registry." };
   if (standing.status !== "good") {
     return { eligible: false, reason: `Academic standing is "${standing.status}" — must be "Good Standing" to apply for hostel accommodation.` };
+  }
+
+  // 1b. Disciplinary hostel block
+  const [hostelBlock] = await db.select()
+    .from(disciplinaryFlagsTable)
+    .where(and(
+      eq(disciplinaryFlagsTable.studentId, studentId),
+      eq(disciplinaryFlagsTable.flagType, "hostel_block"),
+      eq(disciplinaryFlagsTable.active, true),
+    ))
+    .limit(1);
+
+  if (hostelBlock) {
+    return { eligible: false, reason: "Active disciplinary hostel restriction on your account. Contact the Dean of Students office to resolve." };
   }
 
   // 2. No outstanding (pending) fees
