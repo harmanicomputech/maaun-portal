@@ -7,6 +7,10 @@ import resultsRouter from "./results";
 import studentsRouter from "./students";
 import lecturersRouter from "./lecturers";
 import dashboardRouter from "./dashboard";
+import sessionsRouter from "./sessions";
+import paymentsRouter from "./payments";
+import notificationsRouter from "./notifications";
+import activityLogsRouter from "./activity-logs";
 
 const router: IRouter = Router();
 
@@ -18,5 +22,9 @@ router.use(resultsRouter);
 router.use(studentsRouter);
 router.use(lecturersRouter);
 router.use(dashboardRouter);
+router.use(sessionsRouter);
+router.use(paymentsRouter);
+router.use(notificationsRouter);
+router.use(activityLogsRouter);
 
 export default router;

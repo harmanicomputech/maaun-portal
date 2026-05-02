@@ -4,3 +4,7 @@ export * from "./lecturers";
 export * from "./courses";
 export * from "./enrollments";
 export * from "./results";
+export * from "./sessions";
+export * from "./fees";
+export * from "./activity-logs";
+export * from "./notifications";

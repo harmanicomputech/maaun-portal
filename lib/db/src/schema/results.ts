@@ -15,6 +15,7 @@ export const resultsTable = pgTable("results", {
   totalScore: real("total_score"),
   grade: text("grade"),
   gradePoint: real("grade_point"),
+  status: text("status", { enum: ["draft", "submitted", "approved", "locked"] }).notNull().default("draft"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (t) => [

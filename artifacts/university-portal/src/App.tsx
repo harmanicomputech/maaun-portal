@@ -14,6 +14,8 @@ import StudentCourses from "@/pages/student/courses";
 import StudentEnrollments from "@/pages/student/enrollments";
 import StudentResults from "@/pages/student/results";
 import StudentProfile from "@/pages/student/profile";
+import StudentPayments from "@/pages/student/payments";
+import StudentNotifications from "@/pages/student/notifications";
 
 import LecturerDashboard from "@/pages/lecturer/dashboard";
 import LecturerCourses from "@/pages/lecturer/courses";
@@ -25,36 +27,31 @@ import AdminCourses from "@/pages/admin/courses";
 import AdminStudents from "@/pages/admin/students";
 import AdminLecturers from "@/pages/admin/lecturers";
 import AdminResults from "@/pages/admin/results";
+import AdminPayments from "@/pages/admin/payments";
+import AdminSessions from "@/pages/admin/sessions";
+import AdminNotifications from "@/pages/admin/notifications";
+import AdminActivityLogs from "@/pages/admin/activity-logs";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
+    queries: { retry: 1, refetchOnWindowFocus: false },
   },
 });
 
 function Router() {
   return (
     <Switch>
-      <Route path="/login">
-        <AppLayout requireAuth={false}>
-          <Login />
-        </AppLayout>
-      </Route>
-      <Route path="/register">
-        <AppLayout requireAuth={false}>
-          <Register />
-        </AppLayout>
-      </Route>
-      
+      <Route path="/login"><AppLayout requireAuth={false}><Login /></AppLayout></Route>
+      <Route path="/register"><AppLayout requireAuth={false}><Register /></AppLayout></Route>
+
       {/* Student Routes */}
       <Route path="/student/dashboard"><AppLayout><StudentDashboard /></AppLayout></Route>
       <Route path="/student/courses"><AppLayout><StudentCourses /></AppLayout></Route>
       <Route path="/student/enrollments"><AppLayout><StudentEnrollments /></AppLayout></Route>
       <Route path="/student/results"><AppLayout><StudentResults /></AppLayout></Route>
       <Route path="/student/profile"><AppLayout><StudentProfile /></AppLayout></Route>
+      <Route path="/student/payments"><AppLayout><StudentPayments /></AppLayout></Route>
+      <Route path="/student/notifications"><AppLayout><StudentNotifications /></AppLayout></Route>
 
       {/* Lecturer Routes */}
       <Route path="/lecturer/dashboard"><AppLayout><LecturerDashboard /></AppLayout></Route>
@@ -68,14 +65,16 @@ function Router() {
       <Route path="/admin/students"><AppLayout><AdminStudents /></AppLayout></Route>
       <Route path="/admin/lecturers"><AppLayout><AdminLecturers /></AppLayout></Route>
       <Route path="/admin/results"><AppLayout><AdminResults /></AppLayout></Route>
-      
-      {/* Redirect root to login/dashboard (handled by AppLayout logic indirectly, but let's be explicit) */}
+      <Route path="/admin/payments"><AppLayout><AdminPayments /></AppLayout></Route>
+      <Route path="/admin/sessions"><AppLayout><AdminSessions /></AppLayout></Route>
+      <Route path="/admin/notifications"><AppLayout><AdminNotifications /></AppLayout></Route>
+      <Route path="/admin/activity-logs"><AppLayout><AdminActivityLogs /></AppLayout></Route>
+
       <Route path="/">
         <AppLayout>
           <div className="flex items-center justify-center h-full">Redirecting...</div>
         </AppLayout>
       </Route>
-
       <Route component={NotFound} />
     </Switch>
   );
