@@ -1,0 +1,149 @@
+PHASE 27: Disciplinary Appeals & Review System (Due Process Layer)
+
+OBJECTIVE:
+Build a formal appeal system allowing students to challenge disciplinary cases and sanctions, with structured admin review, decision tracking, and integration with existing disciplinary flags.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: disciplinary_appeals
+
+- id
+- case_id (FK → disciplinary_cases)
+- student_id
+- reason (text)
+- evidence (nullable file/url)
+- status (submitted, under_review, accepted, rejected)
+- reviewed_by (admin_id nullable)
+- admin_response (text nullable)
+- created_at
+- resolved_at
+
+Create table: appeal_decisions
+
+- id
+- appeal_id
+- decision (uphold, modify, dismiss)
+- modified_action (nullable)
+- remarks
+- decided_by
+- created_at
+
+--------------------------------------------------
+2. APPEAL FLOW (CRITICAL LOGIC)
+--------------------------------------------------
+
+Student flow:
+1. Student submits appeal on an active disciplinary case
+2. Appeal enters "submitted" state
+3. Admin reviews appeal
+4. Admin makes decision:
+   - uphold → sanction remains
+   - modify → reduce sanction severity
+   - dismiss → case and flags removed
+
+--------------------------------------------------
+3. SYSTEM INTEGRATION (VERY IMPORTANT)
+
+Appeal decision must affect:
+
+- disciplinary_flags:
+  - removed if appeal is dismissed
+  - modified if sanction is reduced
+
+- graduation system:
+  re-evaluates eligibility if flags change
+
+- hostel system:
+  re-evaluates eligibility if restrictions change
+
+- enrollment system:
+  re-checks course access if academic_hold changes
+
+--------------------------------------------------
+4. STUDENT FEATURES
+--------------------------------------------------
+
+Page: /student/disciplinary/appeals
+
+- "Submit Appeal" button on any active case
+- Appeal form:
+  - reason (required)
+  - evidence upload (optional)
+- Appeal status tracker:
+  - submitted → under review → decision
+
+- View appeal history per case
+
+--------------------------------------------------
+5. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/disciplinary/appeals
+
+- List all appeals
+- Filters:
+  - status
+  - case severity
+  - student
+
+- Review panel:
+  - case details
+  - original sanction
+  - student appeal text
+  - evidence preview
+
+- Actions:
+  - uphold sanction
+  - reduce sanction
+  - dismiss case entirely
+
+--------------------------------------------------
+6. NOTIFICATION SYSTEM
+
+Trigger:
+- appeal submitted
+- appeal status updated
+- final decision issued
+
+--------------------------------------------------
+7. AUDIT LOGGING (MANDATORY)
+
+Log:
+- appeal creation
+- admin review actions
+- decision outcomes
+- flag modifications
+
+Must include:
+- admin identity
+- IP address
+- timestamp
+
+--------------------------------------------------
+8. BUSINESS RULES
+
+- Only one active appeal per case
+- Cannot appeal dismissed cases twice
+- Appeals cannot be edited after submission
+- Appeals must be resolved before case closure (optional enforcement toggle)
+
+--------------------------------------------------
+9. UI REQUIREMENTS
+
+Student:
+- clean timeline view per case
+- appeal status badges (blue/yellow/green/red)
+
+Admin:
+- split-screen review interface:
+  left = case details
+  right = appeal content + decision tools
+
+--------------------------------------------------
+10. SECURITY RULES
+
+- Only case owner can submit appeal
+- Admin-only decision rights
+- All decisions are immutable after finalization

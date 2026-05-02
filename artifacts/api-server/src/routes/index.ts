@@ -18,6 +18,7 @@ import timetableRouter from "./timetable";
 import graduationRouter from "./graduation";
 import hostelRouter from "./hostel";
 import disciplinaryRouter from "./disciplinary";
+import appealsRouter from "./appeals";
 
 const router: IRouter = Router();
 
@@ -40,5 +41,6 @@ router.use(timetableRouter);
 router.use(graduationRouter);
 router.use(hostelRouter);
 router.use(disciplinaryRouter);
+router.use(appealsRouter);
 
 export default router;

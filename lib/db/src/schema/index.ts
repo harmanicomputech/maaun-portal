@@ -15,3 +15,4 @@ export * from "./timetable";
 export * from "./graduation";
 export * from "./hostel";
 export * from "./disciplinary";
+export * from "./appeals";
