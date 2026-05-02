@@ -1,0 +1,146 @@
+PHASE 26: Disciplinary Case Management & Sanctions System
+
+OBJECTIVE:
+Build a structured disciplinary system to log, track, escalate, and resolve student misconduct with enforceable sanctions integrated into academic, financial, and hostel systems.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: disciplinary_cases
+- id
+- student_id
+- reported_by (admin_id)
+- title
+- description
+- severity (minor, moderate, major, critical)
+- status (open, under_review, resolved, dismissed)
+- created_at
+
+Create table: disciplinary_actions
+- id
+- case_id
+- action_type (warning, suspension, restriction, expulsion)
+- start_date
+- end_date (nullable)
+- remarks
+
+Create table: disciplinary_flags
+- id
+- student_id
+- flag_type (academic_hold, hostel_block, graduation_block)
+- active (boolean)
+- related_case_id
+
+--------------------------------------------------
+2. CASE WORKFLOW
+--------------------------------------------------
+
+Admin flow:
+
+1. Create case
+2. Assign severity
+3. Add action (if required)
+4. Case moves:
+   open → under_review → resolved/dismissed
+
+--------------------------------------------------
+3. SANCTION ENGINE (CRITICAL)
+--------------------------------------------------
+
+Based on action_type:
+
+WARNING:
+- No restriction, just recorded
+
+SUSPENSION:
+- Block:
+  - course registration
+  - timetable access
+
+RESTRICTION:
+- Block hostel eligibility
+
+EXPULSION:
+- Disable account access
+- Mark student inactive
+
+--------------------------------------------------
+4. SYSTEM INTEGRATION (VERY IMPORTANT)
+
+Must affect:
+
+- Graduation System:
+  active disciplinary flag = admin_status = blocked
+
+- Hostel System:
+  restriction flag blocks hostel application
+
+- Course Registration:
+  suspension blocks enrollment
+
+--------------------------------------------------
+5. STUDENT FEATURES
+--------------------------------------------------
+
+Page: /student/disciplinary
+
+- List all cases
+- View:
+  - case details
+  - status
+  - sanctions applied
+- Visual severity badges
+
+--------------------------------------------------
+6. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/disciplinary
+
+- Create case
+- Search/filter cases
+- View full case timeline
+- Apply sanctions
+- Resolve/dismiss case
+
+--------------------------------------------------
+7. NOTIFICATIONS
+
+Trigger:
+- Case created
+- Status updated
+- Sanction applied
+
+--------------------------------------------------
+8. AUDIT LOGGING
+
+Log:
+- case creation
+- status changes
+- sanctions applied
+- resolution
+
+--------------------------------------------------
+9. SECURITY RULES
+
+- Only admin can create/edit cases
+- Students can only view their own records
+- Expulsion disables login access
+
+--------------------------------------------------
+10. UI REQUIREMENTS
+
+- Color-coded severity:
+  green → minor
+  yellow → moderate
+  orange → major
+  red → critical
+
+- Timeline view for case history
+
+--------------------------------------------------
+11. BUSINESS RULES
+
+- One active expulsion = account disabled
+- Active disciplinary flags override eligibility in graduation system
