@@ -1,0 +1,106 @@
+Build a full-stack Laravel-based University Management Portal for a Nigerian university called “Maryam Abacha American University of Nigeria”.
+
+The system must be production-architecture ready and later deployable on cPanel with MySQL.
+
+TECH STACK REQUIREMENTS:
+- Laravel (latest stable version)
+- Blade templating engine
+- Tailwind CSS for modern UI styling
+- Alpine.js for frontend interactivity
+- MySQL-ready database design (use SQLite only for development compatibility in Replit)
+- No heavy frameworks like React or Vue for now
+
+CORE DESIGN GOAL:
+Build a world-class, modern, highly polished university portal with clean UI/UX, blue theme (#0B3CFE), smooth transitions, and dashboard-driven experience.
+
+ROLE SYSTEM:
+- Student
+- Lecturer
+- Admin
+
+PHASE 1 (MUST IMPLEMENT FIRST - MVP):
+
+1. AUTH SYSTEM
+- Login / Register / Logout
+- Role-based access control (student, lecturer, admin)
+- Middleware for role protection
+
+2. STUDENT MODULE
+- Student profile (matric number, department, level)
+- Student dashboard showing:
+  - Registered courses
+  - CGPA placeholder
+  - Recent activities
+
+3. COURSE MANAGEMENT
+- Create Course model
+- Fields: course code, title, unit, department
+- Course listing page
+
+4. COURSE REGISTRATION SYSTEM
+- Students can register courses per semester
+- Store in enrollments table
+- Prevent duplicate registration
+
+5. RESULT SYSTEM (BASIC FIRST VERSION)
+- Lecturer/Admin can input scores
+- Auto-calculate:
+  - Grade (A-F)
+  - Grade point (0–5 scale)
+- Store results per student per course
+
+6. CGPA CALCULATION LOGIC
+- Implement proper CGPA formula:
+  CGPA = sum(grade_point * course_unit) / sum(course_units)
+- Display on student dashboard
+
+7. UI/UX REQUIREMENTS
+- Very modern dashboard design
+- Tailwind CSS styling
+- Primary color: #0B3CFE
+- Card-based layout
+- Smooth hover animations
+- Skeleton loaders where appropriate
+- Clean typography (Inter or Poppins)
+
+8. DATABASE DESIGN (IMPORTANT)
+Create migrations for:
+- users (with role column)
+- students
+- lecturers
+- courses
+- enrollments
+- results
+
+Use proper foreign keys and relationships.
+
+9. ARCHITECTURE REQUIREMENTS
+- Use Laravel MVC structure properly
+- Controllers separated by domain:
+  - StudentController
+  - CourseController
+  - ResultController
+- Use Form Requests for validation
+- Use Policies or Middleware for authorization
+
+10. SEEDERS (OPTIONAL BUT RECOMMENDED)
+- Create sample admin user
+- Create sample courses
+- Create sample student
+
+IMPORTANT CONSTRAINTS:
+- Must be compatible with cPanel deployment later
+- No external microservices
+- No WebSockets or real-time systems in this phase
+- Keep system lightweight and scalable
+
+OUTPUT EXPECTATION:
+Generate a working Laravel project with:
+- Authentication ready
+- Database migrations
+- Basic UI dashboards
+- Functional course registration
+- Basic result entry and CGPA calculation
+- Clean folder structure
+
+Start by setting up the project structure and authentication first, then proceed step-by-step through each module.
