@@ -1,0 +1,132 @@
+PHASE 21: Official Academic Transcript System (Institutional Grade)
+
+OBJECTIVE:
+Upgrade the system from basic transcript export to a verified, role-controlled academic transcript system with audit and approval tracking.
+
+--------------------------------------------------
+1. TRANSCRIPT ROLES & PERMISSIONS
+--------------------------------------------------
+
+Only allow:
+
+Lecturer:
+- Can generate transcript (view-only for assigned students)
+- Cannot approve or finalize
+
+Admin:
+- Can generate, approve, and finalize official transcripts
+
+Add permission layer:
+- transcript.view
+- transcript.generate
+- transcript.approve
+- transcript.finalize
+
+--------------------------------------------------
+2. TRANSCRIPT WORKFLOW
+--------------------------------------------------
+
+Step 1: Lecturer generates transcript request
+Step 2: System compiles academic record
+Step 3: Transcript enters "DRAFT" state
+Step 4: Admin reviews
+Step 5: Admin marks as "OFFICIAL"
+Step 6: PDF becomes locked and tamper-proof
+
+--------------------------------------------------
+3. DATABASE UPDATE
+--------------------------------------------------
+
+Create:
+transcripts table:
+- id
+- student_id
+- generated_by (user_id)
+- approved_by (nullable)
+- status (draft, pending, approved, official)
+- reference_number (unique)
+- created_at
+
+--------------------------------------------------
+4. TRANSCRIPT CONTENT (FULL ACADEMIC HISTORY)
+--------------------------------------------------
+
+Include:
+- Student biodata
+- Admission info
+- All sessions & semesters
+- Courses taken
+- Grades
+- GPA per semester
+- CGPA
+- Classification
+- Carryover courses
+- Academic remarks
+
+--------------------------------------------------
+5. VERIFICATION SYSTEM (IMPORTANT)
+--------------------------------------------------
+
+Generate:
+- Unique transcript reference number
+- QR code for verification page
+
+Verification page:
+- /verify/transcript/{reference}
+
+Shows:
+- Valid / Invalid
+- Student name
+- CGPA
+- Status (Official or not)
+
+--------------------------------------------------
+6. PDF GENERATION (UPGRADED)
+--------------------------------------------------
+
+Enhance PDF:
+- Add "OFFICIAL TRANSCRIPT" watermark
+- Add reference number
+- Add QR code
+- Add registrar signature line
+- Add issue date
+
+--------------------------------------------------
+7. LECTURER FEATURES
+--------------------------------------------------
+
+- View assigned students
+- Generate transcript (view-only draft)
+- Cannot finalize
+
+--------------------------------------------------
+8. ADMIN FEATURES
+--------------------------------------------------
+
+- View all transcript requests
+- Approve / reject / finalize
+- Download official transcript PDF
+
+--------------------------------------------------
+9. AUDIT LOGGING (CRITICAL)
+--------------------------------------------------
+
+Log:
+- who generated transcript
+- who approved it
+- when it was finalized
+- IP address of action
+
+--------------------------------------------------
+10. SECURITY RULES
+--------------------------------------------------
+
+- Only official transcripts are downloadable as "final PDF"
+- Draft transcripts must be watermarked "UNOFFICIAL"
+- Prevent modification after approval
+
+--------------------------------------------------
+
+Ensure system integrates with:
+- Academic Standing Engine (Phase 20)
+- Result System (approved/locked only)

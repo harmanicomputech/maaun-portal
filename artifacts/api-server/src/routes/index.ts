@@ -12,6 +12,7 @@ import paymentsRouter from "./payments";
 import notificationsRouter from "./notifications";
 import activityLogsRouter from "./activity-logs";
 import academicStandingRouter from "./academic-standing";
+import transcriptsRouter from "./transcripts";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(paymentsRouter);
 router.use(notificationsRouter);
 router.use(activityLogsRouter);
 router.use(academicStandingRouter);
+router.use(transcriptsRouter);
 
 export default router;

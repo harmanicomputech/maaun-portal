@@ -2,7 +2,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
-  User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign, Award,
+  User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
+  Award, ScrollText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,6 +23,7 @@ const ROLE_LINKS = {
     { href: "/lecturer/courses", label: "My Courses", icon: BookOpen },
     { href: "/lecturer/students", label: "Students", icon: Users },
     { href: "/lecturer/results", label: "Manage Results", icon: FileText },
+    { href: "/lecturer/transcript", label: "Transcript Requests", icon: ScrollText },
   ],
   admin: [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -30,6 +32,7 @@ const ROLE_LINKS = {
     { href: "/admin/lecturers", label: "Lecturers", icon: GraduationCap },
     { href: "/admin/results", label: "All Results", icon: FileText },
     { href: "/admin/academic-standing", label: "Academic Standings", icon: Award },
+    { href: "/admin/transcripts", label: "Transcripts", icon: ScrollText },
     { href: "/admin/payments", label: "Payments & Fees", icon: DollarSign },
     { href: "/admin/sessions", label: "Academic Sessions", icon: CalendarDays },
     { href: "/admin/notifications", label: "Notifications", icon: Bell },

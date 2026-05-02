@@ -9,3 +9,4 @@ export * from "./fees";
 export * from "./activity-logs";
 export * from "./notifications";
 export * from "./academic-standings";
+export * from "./transcripts";

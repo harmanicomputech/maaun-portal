@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import VerifyTranscript from "@/pages/verify-transcript";
 
 import StudentDashboard from "@/pages/student/dashboard";
 import StudentCourses from "@/pages/student/courses";
@@ -22,6 +23,7 @@ import LecturerDashboard from "@/pages/lecturer/dashboard";
 import LecturerCourses from "@/pages/lecturer/courses";
 import LecturerStudents from "@/pages/lecturer/students";
 import LecturerResults from "@/pages/lecturer/results";
+import LecturerTranscript from "@/pages/lecturer/transcript";
 
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminCourses from "@/pages/admin/courses";
@@ -33,6 +35,7 @@ import AdminSessions from "@/pages/admin/sessions";
 import AdminNotifications from "@/pages/admin/notifications";
 import AdminActivityLogs from "@/pages/admin/activity-logs";
 import AdminAcademicStanding from "@/pages/admin/academic-standing";
+import AdminTranscripts from "@/pages/admin/transcripts";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +46,9 @@ const queryClient = new QueryClient({
 function Router() {
   return (
     <Switch>
+      {/* Public routes — no auth wrapper */}
+      <Route path="/verify/transcript/:reference" component={VerifyTranscript} />
+
       <Route path="/login"><AppLayout requireAuth={false}><Login /></AppLayout></Route>
       <Route path="/register"><AppLayout requireAuth={false}><Register /></AppLayout></Route>
 
@@ -61,6 +67,7 @@ function Router() {
       <Route path="/lecturer/courses"><AppLayout><LecturerCourses /></AppLayout></Route>
       <Route path="/lecturer/students"><AppLayout><LecturerStudents /></AppLayout></Route>
       <Route path="/lecturer/results"><AppLayout><LecturerResults /></AppLayout></Route>
+      <Route path="/lecturer/transcript"><AppLayout><LecturerTranscript /></AppLayout></Route>
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard"><AppLayout><AdminDashboard /></AppLayout></Route>
@@ -73,6 +80,7 @@ function Router() {
       <Route path="/admin/notifications"><AppLayout><AdminNotifications /></AppLayout></Route>
       <Route path="/admin/activity-logs"><AppLayout><AdminActivityLogs /></AppLayout></Route>
       <Route path="/admin/academic-standing"><AppLayout><AdminAcademicStanding /></AppLayout></Route>
+      <Route path="/admin/transcripts"><AppLayout><AdminTranscripts /></AppLayout></Route>
 
       <Route path="/">
         <AppLayout>
