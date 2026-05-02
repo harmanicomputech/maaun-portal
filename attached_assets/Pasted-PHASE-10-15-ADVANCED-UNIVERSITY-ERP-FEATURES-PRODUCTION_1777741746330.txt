@@ -1,0 +1,253 @@
+PHASE 10–15: ADVANCED UNIVERSITY ERP FEATURES (PRODUCTION-GRADE)
+
+You are a senior Laravel architect upgrading an existing University Management Portal into a real-world, production-grade ERP system.
+
+System Name:
+Maryam Abacha American University of Nigeria Portal
+
+Tech Stack:
+- Laravel (latest)
+- Blade + Tailwind CSS + Alpine.js
+- MySQL (production-ready)
+- Paystack payment integration
+
+STRICT REQUIREMENTS:
+- Maintain clean MVC architecture
+- Use Form Requests for validation
+- Use Policies for authorization
+- Ensure database integrity (foreign keys, constraints)
+- Write scalable, modular code
+- Optimize for cPanel deployment
+- DO NOT BREAK EXISTING FEATURES
+
+--------------------------------------------------
+PHASE 10: ACADEMIC STRUCTURE (CRITICAL)
+--------------------------------------------------
+
+1. Create tables:
+   sessions:
+   - id
+   - name (e.g. 2024/2025)
+   - is_active
+
+   semesters:
+   - id
+   - name (First Semester, Second Semester)
+   - session_id (FK)
+   - is_active
+
+2. Update:
+   - enrollments → add session_id, semester_id
+   - results → add session_id, semester_id
+
+3. Logic:
+   - Only one active session at a time
+   - Only one active semester per session
+
+4. UI:
+   - Admin can manage sessions and semesters
+
+--------------------------------------------------
+PHASE 11: RESULT WORKFLOW + LOCKING SYSTEM
+--------------------------------------------------
+
+1. Update results table:
+   - status (draft, submitted, approved, locked)
+
+2. Workflow:
+   Lecturer:
+   - create/edit results → draft
+   - submit results
+
+   Admin:
+   - approve results
+   - lock results
+
+3. Rules:
+   - Locked results cannot be edited
+   - Only approved results count toward CGPA
+
+4. Add UI:
+   - Status badges
+   - Approval buttons
+
+--------------------------------------------------
+PHASE 12: PAYSTACK PAYMENT SYSTEM
+--------------------------------------------------
+
+Integrate:
+Paystack (use inline + webhook verification)
+
+1. Tables:
+
+fees:
+- id
+- name
+- amount
+- department (nullable)
+- level (nullable)
+
+payments:
+- id
+- user_id
+- fee_id
+- reference (unique)
+- amount
+- status (pending, success, failed)
+- paid_at
+
+2. Flow:
+- Student views fees
+- Click "Pay Now"
+- Initialize Paystack payment
+- Redirect to Paystack
+
+3. Backend:
+- Verify payment via Paystack API (server-side)
+- DO NOT trust frontend callback
+
+4. Webhook:
+- Endpoint: /api/paystack/webhook
+- Verify signature
+- Update payment status
+
+5. Logic:
+- Prevent duplicate payments
+- Restrict course registration if tuition unpaid
+
+6. UI:
+- Payment history page
+- Status badges
+
+--------------------------------------------------
+PHASE 13: TRANSCRIPT + PDF GENERATION
+--------------------------------------------------
+
+Use:
+dompdf
+
+1. Build:
+- Full academic transcript
+
+Include:
+- Student info
+- All sessions/semesters
+- Courses + grades
+- GPA per semester
+- CGPA
+
+2. Add:
+- "Download Transcript" button
+
+3. Layout:
+- Clean, official university style
+- Header + footer
+
+--------------------------------------------------
+PHASE 14: CGPA SYSTEM (ADVANCED)
+--------------------------------------------------
+
+Upgrade CGPA logic:
+
+1. Compute:
+- Semester GPA
+- Cumulative GPA
+
+2. Add:
+- Total units
+- Total grade points
+
+3. Features:
+- Carryover detection (failed courses)
+- Academic probation warning
+
+4. Only include:
+- Approved results
+
+--------------------------------------------------
+PHASE 15: AUDIT LOG SYSTEM
+--------------------------------------------------
+
+1. Create:
+activity_logs table:
+- id
+- user_id
+- action
+- model
+- model_id
+- old_data (JSON)
+- new_data (JSON)
+
+2. Track:
+- Result edits
+- Course creation/deletion
+- Payment updates
+
+3. Admin UI:
+- Activity log viewer
+
+--------------------------------------------------
+PHASE 16: NOTIFICATION SYSTEM
+--------------------------------------------------
+
+Use Laravel Notifications
+
+Trigger:
+- Payment success
+- Result released
+- Course registration
+
+Channels:
+- In-app notifications
+- Email (optional)
+
+--------------------------------------------------
+PHASE 17: ADMIN ANALYTICS DASHBOARD
+--------------------------------------------------
+
+Use lightweight charts
+
+Add:
+- Total revenue
+- Student enrollment trends
+- Pass/fail rates
+- GPA distribution
+
+--------------------------------------------------
+PHASE 18: SYSTEM HARDENING
+--------------------------------------------------
+
+1. Security:
+- CSRF protection
+- Rate limiting (login/payment)
+- Validate all inputs
+
+2. Error pages:
+- 403, 404, 500
+
+3. Performance:
+- Eager loading
+- Query optimization
+
+--------------------------------------------------
+PHASE 19: DEPLOYMENT PREP
+--------------------------------------------------
+
+1. Switch to MySQL
+2. Optimize:
+   php artisan config:cache
+   php artisan route:cache
+3. Set:
+   APP_DEBUG=false
+
+4. Ensure compatibility with cPanel hosting
+
+--------------------------------------------------
+
+FINAL REQUIREMENT:
+- Ensure system is stable after each phase
+- Fix all bugs before proceeding
+- Maintain clean UI with Tailwind (#0B3CFE theme)
+- Keep UX modern, smooth, and intuitive
+
+This system should feel like a premium SaaS university platform, not a basic project.
