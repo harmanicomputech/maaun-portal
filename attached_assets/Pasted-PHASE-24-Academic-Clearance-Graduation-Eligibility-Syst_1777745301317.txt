@@ -1,0 +1,142 @@
+PHASE 24: Academic Clearance & Graduation Eligibility System
+
+OBJECTIVE:
+Build a final institutional control layer that determines whether a student is eligible to graduate based on academic, financial, and administrative clearance.
+
+--------------------------------------------------
+1. CLEARANCE REQUIREMENTS ENGINE
+--------------------------------------------------
+
+A student must pass ALL checks:
+
+ACADEMIC:
+- CGPA ≥ 1.50 (Pass minimum)
+- No outstanding carryover courses
+- All required courses completed for programme
+
+FINANCIAL:
+- No outstanding unpaid fees (from ledger system)
+
+ADMINISTRATIVE:
+- Approved transcript exists
+- No active disciplinary flags (future extensible)
+
+--------------------------------------------------
+2. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: graduation_clearances
+
+- id
+- student_id
+- academic_status (passed/failed)
+- financial_status (cleared/blocked)
+- admin_status (cleared/pending)
+- overall_status (eligible/not eligible)
+- remarks
+- evaluated_at
+
+Create table: graduation_applications
+
+- id
+- student_id
+- session_id
+- status (applied/under_review/approved/rejected)
+- reviewed_by
+- created_at
+
+--------------------------------------------------
+3. CLEARANCE ENGINE LOGIC
+--------------------------------------------------
+
+Service: GraduationEligibilityService
+
+Methods:
+- evaluate(student_id)
+- checkAcademic()
+- checkFinancial()
+- checkAdmin()
+
+Returns:
+- eligible / not eligible
+- detailed breakdown of failures
+
+--------------------------------------------------
+4. STUDENT FEATURES
+--------------------------------------------------
+
+Page: /student/graduation
+
+- Eligibility status card:
+  - Eligible (green)
+  - Not Eligible (red with reasons)
+
+- Breakdown:
+  - Academic status
+  - Financial status
+  - Admin status
+
+- "Apply for Graduation" button (if eligible)
+
+--------------------------------------------------
+5. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/graduation
+
+- List all students
+- Filter:
+  - Eligible
+  - Not eligible
+  - Pending review
+
+- Actions:
+  - Approve graduation
+  - Reject with reason
+  - Override eligibility (admin-only)
+
+--------------------------------------------------
+6. NOTIFICATION SYSTEM
+--------------------------------------------------
+
+Triggers:
+- When student becomes eligible
+- When application is approved/rejected
+
+--------------------------------------------------
+7. PDF OUTPUT
+--------------------------------------------------
+
+Generate:
+- Graduation eligibility report
+
+Includes:
+- Student details
+- CGPA
+- Fee status
+- Clearance status
+- Final verdict
+- Admin signature line
+
+--------------------------------------------------
+8. SYSTEM INTEGRATION (CRITICAL)
+--------------------------------------------------
+
+Must integrate with:
+- CGPA system (Phase 20)
+- Receipts/ledger system (Phase 22)
+- Transcript system (Phase 21)
+- Results system (Phase 11–20)
+
+--------------------------------------------------
+9. BUSINESS RULES
+
+- Eligibility must be real-time recalculated
+- Any change in fees/results immediately affects status
+- Admin override must be logged in activity_logs
+
+--------------------------------------------------
+10. SECURITY
+
+- Only admin can finalize graduation approval
+- Students can only view and apply

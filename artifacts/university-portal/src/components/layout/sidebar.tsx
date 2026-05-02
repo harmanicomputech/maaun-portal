@@ -15,6 +15,7 @@ const ROLE_LINKS = {
     { href: "/student/enrollments",       label: "My Enrollments",     icon: GraduationCap },
     { href: "/student/results",           label: "Academic Results",   icon: FileText },
     { href: "/student/academic-standing", label: "Academic Standing",  icon: Award },
+    { href: "/student/graduation",        label: "Graduation",         icon: GraduationCap },
     { href: "/student/payments",          label: "Fee Payments",       icon: CreditCard },
     { href: "/student/receipts",          label: "My Receipts",        icon: Receipt },
     { href: "/student/notifications",     label: "Notifications",      icon: Bell },
@@ -31,6 +32,7 @@ const ROLE_LINKS = {
   admin: [
     { href: "/admin/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
     { href: "/admin/timetable",          label: "Timetable",          icon: Calendar },
+    { href: "/admin/graduation",         label: "Graduation",         icon: GraduationCap },
     { href: "/admin/courses",            label: "Manage Courses",     icon: BookOpen },
     { href: "/admin/students",           label: "Students",           icon: Users },
     { href: "/admin/lecturers",          label: "Lecturers",          icon: GraduationCap },

@@ -21,6 +21,7 @@ import StudentNotifications from "@/pages/student/notifications";
 import StudentAcademicStanding from "@/pages/student/academic-standing";
 import StudentReceipts from "@/pages/student/receipts";
 import StudentTimetable from "@/pages/student/timetable";
+import StudentGraduation from "@/pages/student/graduation";
 
 import LecturerDashboard from "@/pages/lecturer/dashboard";
 import LecturerCourses from "@/pages/lecturer/courses";
@@ -42,6 +43,7 @@ import AdminAcademicStanding from "@/pages/admin/academic-standing";
 import AdminTranscripts from "@/pages/admin/transcripts";
 import AdminFinance from "@/pages/admin/finance";
 import AdminTimetable from "@/pages/admin/timetable";
+import AdminGraduation from "@/pages/admin/graduation";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +72,7 @@ function Router() {
       <Route path="/student/timetable"><AppLayout><StudentTimetable /></AppLayout></Route>
       <Route path="/student/notifications"><AppLayout><StudentNotifications /></AppLayout></Route>
       <Route path="/student/academic-standing"><AppLayout><StudentAcademicStanding /></AppLayout></Route>
+      <Route path="/student/graduation"><AppLayout><StudentGraduation /></AppLayout></Route>
 
       {/* Lecturer Routes */}
       <Route path="/lecturer/dashboard"><AppLayout><LecturerDashboard /></AppLayout></Route>
@@ -93,6 +96,7 @@ function Router() {
       <Route path="/admin/transcripts"><AppLayout><AdminTranscripts /></AppLayout></Route>
       <Route path="/admin/finance"><AppLayout><AdminFinance /></AppLayout></Route>
       <Route path="/admin/timetable"><AppLayout><AdminTimetable /></AppLayout></Route>
+      <Route path="/admin/graduation"><AppLayout><AdminGraduation /></AppLayout></Route>
 
       <Route path="/">
         <AppLayout>

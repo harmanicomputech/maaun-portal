@@ -12,3 +12,4 @@ export * from "./academic-standings";
 export * from "./transcripts";
 export * from "./financial";
 export * from "./timetable";
+export * from "./graduation";

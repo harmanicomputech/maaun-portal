@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,7 +169,7 @@ export default function AdminTimetable() {
               <SelectTrigger className="w-48"><SelectValue placeholder="All Departments" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Departments</SelectItem>
-                {depts.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                {depts.filter(d => !!d).map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={filterVenue} onValueChange={setFilterVenue}>
@@ -189,8 +189,8 @@ export default function AdminTimetable() {
                   <div className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-3">Time</div>
                   {DAYS.map(d => <div key={d} className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-3 text-center">{d}</div>)}
                   {TIME_SLOTS.slice(0, 10).map(hour => (
-                    <>
-                      <div key={`t-${hour}`} className="bg-muted/60 text-xs text-muted-foreground px-3 py-2 font-mono flex items-start pt-2">{hour}</div>
+                    <React.Fragment key={hour}>
+                      <div className="bg-muted/60 text-xs text-muted-foreground px-3 py-2 font-mono flex items-start pt-2">{hour}</div>
                       {DAYS.map(day => {
                         const slotEntries = filtered.filter((e: any) => {
                           if (e.dayOfWeek !== day) return false;
@@ -212,7 +212,7 @@ export default function AdminTimetable() {
                           </div>
                         );
                       })}
-                    </>
+                    </React.Fragment>
                   ))}
                 </div>
               </div>
