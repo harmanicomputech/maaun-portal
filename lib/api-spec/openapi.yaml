@@ -1,22 +1,37 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Maryam Abacha American University of Nigeria - University Management Portal API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: users
+    description: User management
+  - name: students
+    description: Student operations
+  - name: lecturers
+    description: Lecturer operations
+  - name: courses
+    description: Course management
+  - name: enrollments
+    description: Course registration
+  - name: results
+    description: Results and grading
+  - name: dashboard
+    description: Dashboard summaries
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +39,499 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: Registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithProfile"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /courses:
+    get:
+      operationId: listCourses
+      tags: [courses]
+      summary: List all courses
+      parameters:
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: level
+          in: query
+          schema:
+            type: string
+        - name: semester
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+    post:
+      operationId: createCourse
+      tags: [courses]
+      summary: Create a new course (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseBody"
+      responses:
+        "201":
+          description: Course created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+
+  /courses/{id}:
+    get:
+      operationId: getCourse
+      tags: [courses]
+      summary: Get a single course
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Course details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+    put:
+      operationId: updateCourse
+      tags: [courses]
+      summary: Update a course (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseBody"
+      responses:
+        "200":
+          description: Updated course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+    delete:
+      operationId: deleteCourse
+      tags: [courses]
+      summary: Delete a course (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /enrollments:
+    get:
+      operationId: listEnrollments
+      tags: [enrollments]
+      summary: List enrollments (student sees own, admin/lecturer sees all)
+      parameters:
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+        - name: courseId
+          in: query
+          schema:
+            type: integer
+        - name: semester
+          in: query
+          schema:
+            type: string
+        - name: academicYear
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Enrollments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Enrollment"
+    post:
+      operationId: enrollCourse
+      tags: [enrollments]
+      summary: Register/enroll in a course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnrollCourseBody"
+      responses:
+        "201":
+          description: Enrolled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enrollment"
+        "409":
+          description: Already enrolled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /enrollments/{id}:
+    delete:
+      operationId: dropCourse
+      tags: [enrollments]
+      summary: Drop a course enrollment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dropped
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /results:
+    get:
+      operationId: listResults
+      tags: [results]
+      summary: List results
+      parameters:
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+        - name: courseId
+          in: query
+          schema:
+            type: integer
+        - name: semester
+          in: query
+          schema:
+            type: string
+        - name: academicYear
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
+    post:
+      operationId: submitResult
+      tags: [results]
+      summary: Submit or update a result (lecturer/admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitResultBody"
+      responses:
+        "201":
+          description: Result submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+
+  /results/{id}:
+    put:
+      operationId: updateResult
+      tags: [results]
+      summary: Update a result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResultBody"
+      responses:
+        "200":
+          description: Updated result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+
+  /students:
+    get:
+      operationId: listStudents
+      tags: [students]
+      summary: List all students (admin/lecturer)
+      parameters:
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: level
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentProfile"
+
+  /students/{id}:
+    get:
+      operationId: getStudent
+      tags: [students]
+      summary: Get student profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProfile"
+    put:
+      operationId: updateStudent
+      tags: [students]
+      summary: Update student profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStudentBody"
+      responses:
+        "200":
+          description: Updated student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProfile"
+
+  /students/{id}/cgpa:
+    get:
+      operationId: getStudentCgpa
+      tags: [students]
+      summary: Calculate and get student CGPA
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: CGPA data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CgpaResponse"
+
+  /lecturers:
+    get:
+      operationId: listLecturers
+      tags: [lecturers]
+      summary: List all lecturers
+      responses:
+        "200":
+          description: Lecturers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LecturerProfile"
+
+  /lecturers/{id}:
+    get:
+      operationId: getLecturer
+      tags: [lecturers]
+      summary: Get lecturer profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lecturer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerProfile"
+
+  /dashboard/student:
+    get:
+      operationId: getStudentDashboard
+      tags: [dashboard]
+      summary: Student dashboard summary (registered courses, CGPA, recent activity)
+      responses:
+        "200":
+          description: Student dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentDashboard"
+
+  /dashboard/admin:
+    get:
+      operationId: getAdminDashboard
+      tags: [dashboard]
+      summary: Admin dashboard summary
+      responses:
+        "200":
+          description: Admin dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboard"
+
+  /dashboard/lecturer:
+    get:
+      operationId: getLecturerDashboard
+      tags: [dashboard]
+      summary: Lecturer dashboard summary
+      responses:
+        "200":
+          description: Lecturer dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDashboard"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +539,431 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    RegisterBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [student, lecturer, admin]
+      required: [name, email, password, role]
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserWithProfile"
+        token:
+          type: string
+      required: [user, token]
+
+    UserWithProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [student, lecturer, admin]
+        studentProfile:
+          $ref: "#/components/schemas/StudentProfile"
+          nullable: true
+        lecturerProfile:
+          $ref: "#/components/schemas/LecturerProfile"
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, name, email, role, createdAt]
+
+    StudentProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        matricNumber:
+          type: string
+        department:
+          type: string
+        faculty:
+          type: string
+        level:
+          type: string
+        cgpa:
+          type: number
+          nullable: true
+        enrollmentYear:
+          type: string
+        createdAt:
+          type: string
+      required: [id, userId, name, email, matricNumber, department, faculty, level, enrollmentYear, createdAt]
+
+    LecturerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        staffId:
+          type: string
+        department:
+          type: string
+        faculty:
+          type: string
+        designation:
+          type: string
+        createdAt:
+          type: string
+      required: [id, userId, name, email, staffId, department, faculty, designation, createdAt]
+
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+        courseCode:
+          type: string
+        title:
+          type: string
+        unit:
+          type: integer
+        department:
+          type: string
+        faculty:
+          type: string
+        level:
+          type: string
+        semester:
+          type: string
+          enum: [first, second]
+        description:
+          type: string
+          nullable: true
+        lecturerId:
+          type: integer
+          nullable: true
+        lecturerName:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, courseCode, title, unit, department, faculty, level, semester, createdAt]
+
+    CreateCourseBody:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        title:
+          type: string
+        unit:
+          type: integer
+        department:
+          type: string
+        faculty:
+          type: string
+        level:
+          type: string
+        semester:
+          type: string
+          enum: [first, second]
+        description:
+          type: string
+        lecturerId:
+          type: integer
+      required: [courseCode, title, unit, department, faculty, level, semester]
+
+    Enrollment:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        courseId:
+          type: integer
+        semester:
+          type: string
+        academicYear:
+          type: string
+        status:
+          type: string
+          enum: [active, dropped, completed]
+        course:
+          $ref: "#/components/schemas/Course"
+          nullable: true
+        student:
+          $ref: "#/components/schemas/StudentProfile"
+          nullable: true
+        enrolledAt:
+          type: string
+      required: [id, studentId, courseId, semester, academicYear, status, enrolledAt]
+
+    EnrollCourseBody:
+      type: object
+      properties:
+        courseId:
+          type: integer
+        semester:
+          type: string
+        academicYear:
+          type: string
+      required: [courseId, semester, academicYear]
+
+    Result:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        courseId:
+          type: integer
+        semester:
+          type: string
+        academicYear:
+          type: string
+        caScore:
+          type: number
+          nullable: true
+        examScore:
+          type: number
+          nullable: true
+        totalScore:
+          type: number
+          nullable: true
+        grade:
+          type: string
+          nullable: true
+        gradePoint:
+          type: number
+          nullable: true
+        course:
+          $ref: "#/components/schemas/Course"
+          nullable: true
+        student:
+          $ref: "#/components/schemas/StudentProfile"
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, studentId, courseId, semester, academicYear, createdAt]
+
+    SubmitResultBody:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        courseId:
+          type: integer
+        semester:
+          type: string
+        academicYear:
+          type: string
+        caScore:
+          type: number
+        examScore:
+          type: number
+      required: [studentId, courseId, semester, academicYear]
+
+    UpdateResultBody:
+      type: object
+      properties:
+        caScore:
+          type: number
+        examScore:
+          type: number
+      required: []
+
+    UpdateStudentBody:
+      type: object
+      properties:
+        department:
+          type: string
+        faculty:
+          type: string
+        level:
+          type: string
+      required: []
+
+    CgpaResponse:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        cgpa:
+          type: number
+        totalUnitsAttempted:
+          type: integer
+        totalQualityPoints:
+          type: number
+        semesterBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/SemesterCgpa"
+      required: [studentId, cgpa, totalUnitsAttempted, totalQualityPoints, semesterBreakdown]
+
+    SemesterCgpa:
+      type: object
+      properties:
+        semester:
+          type: string
+        academicYear:
+          type: string
+        gpa:
+          type: number
+        unitsAttempted:
+          type: integer
+        qualityPoints:
+          type: number
+      required: [semester, academicYear, gpa, unitsAttempted, qualityPoints]
+
+    StudentDashboard:
+      type: object
+      properties:
+        student:
+          $ref: "#/components/schemas/StudentProfile"
+        cgpa:
+          type: number
+          nullable: true
+        totalCourses:
+          type: integer
+        currentSemesterCourses:
+          type: integer
+        totalUnits:
+          type: integer
+        recentResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+        enrolledCourses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Enrollment"
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+      required: [cgpa, totalCourses, currentSemesterCourses, totalUnits, recentResults, enrolledCourses, notifications]
+
+    AdminDashboard:
+      type: object
+      properties:
+        totalStudents:
+          type: integer
+        totalLecturers:
+          type: integer
+        totalCourses:
+          type: integer
+        totalEnrollments:
+          type: integer
+        studentsByDepartment:
+          type: array
+          items:
+            $ref: "#/components/schemas/DepartmentCount"
+        recentEnrollments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Enrollment"
+        coursesByFaculty:
+          type: array
+          items:
+            $ref: "#/components/schemas/FacultyCount"
+      required: [totalStudents, totalLecturers, totalCourses, totalEnrollments, studentsByDepartment, recentEnrollments, coursesByFaculty]
+
+    LecturerDashboard:
+      type: object
+      properties:
+        lecturer:
+          $ref: "#/components/schemas/LecturerProfile"
+        assignedCourses:
+          type: integer
+        totalStudentsTeaching:
+          type: integer
+        pendingResults:
+          type: integer
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+        recentResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+      required: [assignedCourses, totalStudentsTeaching, pendingResults, courses, recentResults]
+
+    DepartmentCount:
+      type: object
+      properties:
+        department:
+          type: string
+        count:
+          type: integer
+      required: [department, count]
+
+    FacultyCount:
+      type: object
+      properties:
+        faculty:
+          type: string
+        count:
+          type: integer
+      required: [faculty, count]
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+        type:
+          type: string
+        createdAt:
+          type: string
+      required: [id, message, type, createdAt]
