@@ -1,0 +1,157 @@
+PHASE 22: Financial Ledger + Official Receipt System (University Grade)
+
+OBJECTIVE:
+Transform payments module into a full financial accountability system with verified receipts, ledger tracking, and reconciliation between students, fees, and payments.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: receipts
+
+- id
+- payment_id (FK)
+- user_id (FK)
+- reference_number (unique)
+- amount
+- fee_name
+- status (pending, confirmed, reversed)
+- issued_by (admin_id nullable)
+- issued_at
+- created_at
+
+Create table: financial_ledgers
+
+- id
+- user_id
+- type (credit/debit)
+- amount
+- description
+- related_payment_id
+- balance_after
+- created_at
+
+--------------------------------------------------
+2. PAYMENT → RECEIPT FLOW
+--------------------------------------------------
+
+When Paystack payment is confirmed:
+
+Step 1:
+- Create receipt automatically
+- Generate unique receipt number
+
+Step 2:
+- Update financial ledger:
+  - credit student account
+
+Step 3:
+- Mark payment as "confirmed"
+
+--------------------------------------------------
+3. ADMIN VERIFICATION LAYER
+--------------------------------------------------
+
+Admin can:
+- confirm receipt
+- reverse receipt (if fraud/error)
+- audit financial history
+
+All actions must:
+- log into activity_logs
+- include IP address
+- include admin identity
+
+--------------------------------------------------
+4. STUDENT FEATURES
+--------------------------------------------------
+
+Student page: /student/receipts
+
+- View all receipts
+- Filter by session/fee type
+- Download official receipt PDF
+- See payment history timeline
+
+--------------------------------------------------
+5. RECEIPT PDF GENERATION
+--------------------------------------------------
+
+Each receipt must include:
+
+- University header
+- Student details
+- Fee type (e.g. Tuition Fee)
+- Amount paid
+- Payment method (Paystack)
+- Reference number
+- Receipt number
+- Date of payment
+- QR code linking to verification endpoint:
+  /verify/receipt/:reference
+
+Watermark:
+- "OFFICIAL PAYMENT RECEIPT - VERIFIED"
+
+--------------------------------------------------
+6. PUBLIC VERIFICATION SYSTEM
+--------------------------------------------------
+
+Create endpoint:
+GET /verify/receipt/:reference
+
+Shows:
+- Valid / Invalid
+- Student name
+- Fee type
+- Amount
+- Status (Confirmed / Reversed)
+- Payment date
+
+No authentication required.
+
+--------------------------------------------------
+7. FINANCIAL LEDGER SYSTEM (CRITICAL)
+--------------------------------------------------
+
+Maintain running balance per student:
+
+- Every payment = credit
+- Any reversal = debit
+
+Display:
+- Total paid
+- Outstanding balance (if fee structure exists)
+- Payment timeline
+
+--------------------------------------------------
+8. ADMIN FINANCE DASHBOARD
+--------------------------------------------------
+
+Add analytics:
+- Total revenue
+- Payments per fee type
+- Pending confirmations
+- Reversed transactions
+
+Include charts.
+
+--------------------------------------------------
+9. SECURITY RULES
+--------------------------------------------------
+
+- Receipts cannot be edited once confirmed
+- Only admin can reverse
+- All financial actions are immutable logs
+
+--------------------------------------------------
+10. INTEGRATION RULES
+--------------------------------------------------
+
+Must integrate with:
+- Paystack payment system (Phase 12)
+- Activity log system
+- Student profile system
+
+Ensure full consistency between:
+Payment → Receipt → Ledger → Verification

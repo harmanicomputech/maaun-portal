@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import VerifyTranscript from "@/pages/verify-transcript";
+import VerifyReceipt from "@/pages/verify-receipt";
 
 import StudentDashboard from "@/pages/student/dashboard";
 import StudentCourses from "@/pages/student/courses";
@@ -18,6 +19,7 @@ import StudentProfile from "@/pages/student/profile";
 import StudentPayments from "@/pages/student/payments";
 import StudentNotifications from "@/pages/student/notifications";
 import StudentAcademicStanding from "@/pages/student/academic-standing";
+import StudentReceipts from "@/pages/student/receipts";
 
 import LecturerDashboard from "@/pages/lecturer/dashboard";
 import LecturerCourses from "@/pages/lecturer/courses";
@@ -36,6 +38,7 @@ import AdminNotifications from "@/pages/admin/notifications";
 import AdminActivityLogs from "@/pages/admin/activity-logs";
 import AdminAcademicStanding from "@/pages/admin/academic-standing";
 import AdminTranscripts from "@/pages/admin/transcripts";
+import AdminFinance from "@/pages/admin/finance";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,8 +49,9 @@ const queryClient = new QueryClient({
 function Router() {
   return (
     <Switch>
-      {/* Public routes — no auth wrapper */}
+      {/* Public routes — no auth */}
       <Route path="/verify/transcript/:reference" component={VerifyTranscript} />
+      <Route path="/verify/receipt/:reference" component={VerifyReceipt} />
 
       <Route path="/login"><AppLayout requireAuth={false}><Login /></AppLayout></Route>
       <Route path="/register"><AppLayout requireAuth={false}><Register /></AppLayout></Route>
@@ -59,6 +63,7 @@ function Router() {
       <Route path="/student/results"><AppLayout><StudentResults /></AppLayout></Route>
       <Route path="/student/profile"><AppLayout><StudentProfile /></AppLayout></Route>
       <Route path="/student/payments"><AppLayout><StudentPayments /></AppLayout></Route>
+      <Route path="/student/receipts"><AppLayout><StudentReceipts /></AppLayout></Route>
       <Route path="/student/notifications"><AppLayout><StudentNotifications /></AppLayout></Route>
       <Route path="/student/academic-standing"><AppLayout><StudentAcademicStanding /></AppLayout></Route>
 
@@ -81,6 +86,7 @@ function Router() {
       <Route path="/admin/activity-logs"><AppLayout><AdminActivityLogs /></AppLayout></Route>
       <Route path="/admin/academic-standing"><AppLayout><AdminAcademicStanding /></AppLayout></Route>
       <Route path="/admin/transcripts"><AppLayout><AdminTranscripts /></AppLayout></Route>
+      <Route path="/admin/finance"><AppLayout><AdminFinance /></AppLayout></Route>
 
       <Route path="/">
         <AppLayout>

@@ -4,6 +4,7 @@ import { db, feesTable, paymentsTable, usersTable } from "@workspace/db";
 import { requireAuth } from "../lib/auth-middleware";
 import { logActivity } from "../lib/activity-logger";
 import { createNotification } from "../lib/notification-helper";
+import { createReceiptAndLedger } from "./financial";
 import crypto from "crypto";
 import axios from "axios";
 
@@ -99,7 +100,6 @@ router.post("/payments/initialize", requireAuth, async (req, res) => {
   }).returning();
 
   if (!PAYSTACK_SECRET) {
-    // Test mode fallback — return mock URL
     return res.json({
       payment: { ...payment, createdAt: payment.createdAt.toISOString(), paidAt: null },
       authorizationUrl: null,
@@ -131,12 +131,36 @@ router.post("/payments/initialize", requireAuth, async (req, res) => {
   }
 });
 
-// Verify payment
+// Verify payment — auto-creates receipt + ledger entry on success
 router.get("/payments/verify/:reference", requireAuth, async (req, res) => {
   const { reference } = req.params;
-  const [payment] = await db.select().from(paymentsTable).where(eq(paymentsTable.reference, reference)).limit(1);
+  const ip = req.headers["x-forwarded-for"]?.toString() ?? req.socket.remoteAddress ?? "unknown";
+
+  const rows = await db
+    .select({
+      id: paymentsTable.id,
+      userId: paymentsTable.userId,
+      feeId: paymentsTable.feeId,
+      reference: paymentsTable.reference,
+      amount: paymentsTable.amount,
+      status: paymentsTable.status,
+      paidAt: paymentsTable.paidAt,
+      createdAt: paymentsTable.createdAt,
+      feeName: feesTable.name,
+    })
+    .from(paymentsTable)
+    .leftJoin(feesTable, eq(paymentsTable.feeId, feesTable.id))
+    .where(eq(paymentsTable.reference, reference))
+    .limit(1);
+
+  const payment = rows[0];
   if (!payment) return res.status(404).json({ error: "Payment not found" });
-  if (payment.status === "success") return res.json({ ...payment, paidAt: payment.paidAt?.toISOString(), createdAt: payment.createdAt.toISOString() });
+
+  if (payment.status === "success") {
+    // Idempotent — ensure receipt exists for already-confirmed payments
+    await createReceiptAndLedger(payment.id, payment.userId, payment.amount, payment.feeName ?? "Fee", ip);
+    return res.json({ ...payment, paidAt: payment.paidAt?.toISOString(), createdAt: payment.createdAt.toISOString() });
+  }
 
   if (!PAYSTACK_SECRET) {
     return res.status(400).json({ error: "Cannot verify in test mode" });
@@ -152,8 +176,15 @@ router.get("/payments/verify/:reference", requireAuth, async (req, res) => {
       const [updated] = await db.update(paymentsTable)
         .set({ status: "success", paidAt: new Date() })
         .where(eq(paymentsTable.reference, reference)).returning();
+
+      await createReceiptAndLedger(updated.id, updated.userId, updated.amount, payment.feeName ?? "Fee", ip);
       await logActivity(payment.userId, "payment_success", "payment", payment.id, { status: "pending" }, { status: "success" });
-      await createNotification(payment.userId, "Payment Successful", `Your payment of ₦${payment.amount.toLocaleString()} was confirmed. Ref: ${reference}`, "payment");
+      await createNotification(
+        payment.userId,
+        "Payment Confirmed — Receipt Issued",
+        `Your payment of ₦${payment.amount.toLocaleString()} for ${payment.feeName ?? "fee"} was confirmed. An official receipt has been generated in My Receipts.`,
+        "payment"
+      );
       return res.json({ ...updated, paidAt: updated.paidAt?.toISOString(), createdAt: updated.createdAt.toISOString() });
     } else {
       await db.update(paymentsTable).set({ status: "failed" }).where(eq(paymentsTable.reference, reference));
@@ -164,7 +195,7 @@ router.get("/payments/verify/:reference", requireAuth, async (req, res) => {
   }
 });
 
-// Paystack webhook (no auth)
+// Paystack webhook — auto-creates receipt + ledger entry
 router.post("/paystack/webhook", async (req, res) => {
   const hash = crypto.createHmac("sha512", PAYSTACK_SECRET).update(JSON.stringify(req.body)).digest("hex");
   if (hash !== req.headers["x-paystack-signature"]) return res.status(401).json({ error: "Invalid signature" });
@@ -172,10 +203,18 @@ router.post("/paystack/webhook", async (req, res) => {
   const event = req.body;
   if (event.event === "charge.success") {
     const reference = event.data.reference;
-    const [payment] = await db.select().from(paymentsTable).where(eq(paymentsTable.reference, reference)).limit(1);
+    const rows = await db
+      .select({ id: paymentsTable.id, userId: paymentsTable.userId, amount: paymentsTable.amount, status: paymentsTable.status, feeName: feesTable.name })
+      .from(paymentsTable)
+      .leftJoin(feesTable, eq(paymentsTable.feeId, feesTable.id))
+      .where(eq(paymentsTable.reference, reference))
+      .limit(1);
+
+    const payment = rows[0];
     if (payment && payment.status !== "success") {
       await db.update(paymentsTable).set({ status: "success", paidAt: new Date() }).where(eq(paymentsTable.reference, reference));
-      await createNotification(payment.userId, "Payment Confirmed via Webhook", `Payment ref: ${reference} confirmed.`, "payment");
+      await createReceiptAndLedger(payment.id, payment.userId, payment.amount, payment.feeName ?? "Fee", "paystack-webhook");
+      await createNotification(payment.userId, "Payment Confirmed — Receipt Issued", `Payment ref: ${reference} confirmed. Receipt issued.`, "payment");
     }
   }
   return res.sendStatus(200);

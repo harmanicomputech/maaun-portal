@@ -13,6 +13,7 @@ import notificationsRouter from "./notifications";
 import activityLogsRouter from "./activity-logs";
 import academicStandingRouter from "./academic-standing";
 import transcriptsRouter from "./transcripts";
+import financialRouter from "./financial";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(notificationsRouter);
 router.use(activityLogsRouter);
 router.use(academicStandingRouter);
 router.use(transcriptsRouter);
+router.use(financialRouter);
 
 export default router;
