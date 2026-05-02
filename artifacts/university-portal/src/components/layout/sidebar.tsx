@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
   User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
-  Award, ScrollText, Receipt, Calendar,
+  Award, ScrollText, Receipt, Calendar, Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +16,7 @@ const ROLE_LINKS = {
     { href: "/student/results",           label: "Academic Results",   icon: FileText },
     { href: "/student/academic-standing", label: "Academic Standing",  icon: Award },
     { href: "/student/graduation",        label: "Graduation",         icon: GraduationCap },
+    { href: "/student/hostel",            label: "Hostel",             icon: Home },
     { href: "/student/payments",          label: "Fee Payments",       icon: CreditCard },
     { href: "/student/receipts",          label: "My Receipts",        icon: Receipt },
     { href: "/student/notifications",     label: "Notifications",      icon: Bell },
@@ -33,6 +34,7 @@ const ROLE_LINKS = {
     { href: "/admin/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
     { href: "/admin/timetable",          label: "Timetable",          icon: Calendar },
     { href: "/admin/graduation",         label: "Graduation",         icon: GraduationCap },
+    { href: "/admin/hostel",             label: "Hostel",             icon: Home },
     { href: "/admin/courses",            label: "Manage Courses",     icon: BookOpen },
     { href: "/admin/students",           label: "Students",           icon: Users },
     { href: "/admin/lecturers",          label: "Lecturers",          icon: GraduationCap },

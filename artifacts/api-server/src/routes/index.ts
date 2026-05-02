@@ -16,6 +16,7 @@ import transcriptsRouter from "./transcripts";
 import financialRouter from "./financial";
 import timetableRouter from "./timetable";
 import graduationRouter from "./graduation";
+import hostelRouter from "./hostel";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(transcriptsRouter);
 router.use(financialRouter);
 router.use(timetableRouter);
 router.use(graduationRouter);
+router.use(hostelRouter);
 
 export default router;

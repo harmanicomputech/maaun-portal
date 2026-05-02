@@ -1,0 +1,170 @@
+PHASE 25: Hostel & Accommodation Management System (Eligibility-Based Allocation)
+
+OBJECTIVE:
+Build a structured hostel allocation system where students apply, admin allocates rooms based on eligibility, capacity constraints, and payment confirmation.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: hostels
+- id
+- name (e.g. Block A, Female Hostel 1)
+- total_rooms
+- location
+
+Create table: rooms
+- id
+- hostel_id (FK)
+- room_number
+- capacity (e.g. 2 beds, 4 beds)
+- status (available, full, maintenance)
+
+Create table: bed_spaces
+- id
+- room_id (FK)
+- bed_label (A, B, C, D)
+- student_id (nullable)
+- status (vacant, occupied)
+
+Create table: hostel_applications
+- id
+- student_id
+- session_id
+- status (applied, approved, rejected, allocated)
+- priority_score
+- remarks
+- created_at
+
+Create table: hostel_allocations
+- id
+- student_id
+- bed_space_id
+- allocated_by (admin_id)
+- allocated_at
+- status (active, moved, vacated)
+
+--------------------------------------------------
+2. ELIGIBILITY RULES (CRITICAL)
+--------------------------------------------------
+
+A student can only apply if:
+
+- Must be in GOOD ACADEMIC STANDING (from Phase 24)
+- Must have NO outstanding fees (ledger check)
+- Must be officially enrolled in current session
+
+--------------------------------------------------
+3. APPLICATION FLOW
+--------------------------------------------------
+
+Student:
+1. Applies for hostel
+2. System validates eligibility
+3. Application enters "applied" state
+
+Admin:
+1. Reviews applications
+2. Assigns room + bed manually or auto-assign
+3. Approves allocation
+
+--------------------------------------------------
+4. AUTO ALLOCATION ENGINE (OPTIONAL ADVANCED)
+--------------------------------------------------
+
+If enabled:
+
+- Prioritize:
+  1. CGPA (higher priority gets better rooms)
+  2. Level (final year first)
+  3. Payment status (fully cleared students first)
+
+- Auto-fill available beds
+
+--------------------------------------------------
+5. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/hostel
+
+Tabs:
+- Applications
+- Rooms
+- Allocations
+
+Functions:
+- Create hostel blocks
+- Create rooms and beds
+- Assign students manually
+- Auto-assign button
+- View occupancy heatmap
+
+--------------------------------------------------
+6. STUDENT FEATURES
+--------------------------------------------------
+
+Page: /student/hostel
+
+- Apply for accommodation
+- View application status
+- View assigned room (if approved)
+- Hostel details:
+  - block
+  - room number
+  - bed label
+
+--------------------------------------------------
+7. NOTIFICATIONS
+
+Trigger:
+- Application submitted
+- Application approved/rejected
+- Room allocated
+
+--------------------------------------------------
+8. CONFLICT RULES
+
+- One student = one bed only
+- No double allocation
+- Room capacity must never be exceeded
+- Cannot allocate if student already has active bed
+
+--------------------------------------------------
+9. UI REQUIREMENTS
+
+Admin:
+- Grid view of rooms (like dashboard cards)
+- Color-coded occupancy:
+  green = available
+  yellow = partially filled
+  red = full
+
+Student:
+- Simple application form
+- Status tracker (timeline style)
+
+--------------------------------------------------
+10. AUDIT LOGGING
+
+Log:
+- allocation actions
+- overrides
+- room changes
+- deletions
+
+Must include admin identity + IP
+
+--------------------------------------------------
+11. INTEGRATION RULES
+
+Must integrate with:
+- Graduation system (Phase 24)
+- Financial ledger system
+- Student academic status engine
+
+--------------------------------------------------
+12. BUSINESS RULES
+
+- Students on probation CANNOT apply
+- Students with unpaid fees CANNOT apply
+- Final year students get priority (optional rule toggle)
