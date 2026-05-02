@@ -1,0 +1,122 @@
+PHASE 20: Academic Standing + Honours Classification System
+
+OBJECTIVE:
+Build a robust academic standing engine with CGPA classification and PDF export.
+
+----------------------------------------
+1. CLASSIFICATION ENGINE
+----------------------------------------
+
+Create a service:
+AcademicStandingService
+
+Methods:
+- calculateCGPA(student_id)
+- getClassification(cgpa)
+- getAcademicStatus(student_id)
+
+Rules:
+- Use ONLY approved/locked results
+- Compute:
+  - Semester GPA
+  - Cumulative CGPA
+
+----------------------------------------
+2. ACADEMIC STATUS LOGIC
+----------------------------------------
+
+Determine:
+
+- Good Standing → CGPA ≥ 2.00
+- Probation → CGPA < 2.00
+- Withdrawal Risk → CGPA < 1.00 for 2 consecutive semesters
+
+Also include:
+- Carryover courses (failed courses)
+
+----------------------------------------
+3. DATABASE (OPTIONAL OPTIMIZATION)
+----------------------------------------
+
+Create:
+academic_standings table:
+- id
+- student_id
+- cgpa
+- classification
+- status
+- generated_at
+
+----------------------------------------
+4. PDF REPORT GENERATION
+----------------------------------------
+
+Use dompdf
+
+Create:
+"Academic Standing Report"
+
+Include:
+- Student Name
+- Matric Number
+- Department
+- All semesters with GPA
+- CGPA
+- Classification (e.g. Second Class Upper)
+- Academic Status (Good / Probation)
+- Carryover courses list
+
+Add:
+- University-style header
+- Footer with date + signature line
+
+----------------------------------------
+5. STUDENT FEATURES
+----------------------------------------
+
+- View Academic Standing page
+- Download PDF report
+- See:
+  - CGPA
+  - Classification
+  - Status
+  - Warnings (probation/carryover)
+
+----------------------------------------
+6. ADMIN FEATURES
+----------------------------------------
+
+- View all students’ standings
+- Filter:
+  - By classification
+  - By probation status
+- Export individual reports
+
+----------------------------------------
+7. UI REQUIREMENTS
+----------------------------------------
+
+- Use cards + badges:
+  - Green → Good Standing
+  - Yellow → Probation
+  - Red → Withdrawal Risk
+
+- Highlight classification prominently
+
+----------------------------------------
+8. VALIDATION RULES
+----------------------------------------
+
+- Only generate report if results exist
+- Only include approved/locked results
+
+----------------------------------------
+9. PERFORMANCE
+----------------------------------------
+
+- Use eager loading
+- Cache CGPA calculations if needed
+
+----------------------------------------
+
+Ensure system integrates cleanly with existing CGPA logic.

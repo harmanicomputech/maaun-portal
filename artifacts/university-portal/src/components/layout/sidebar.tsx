@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
-  User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
+  User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign, Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +12,7 @@ const ROLE_LINKS = {
     { href: "/student/courses", label: "Browse Courses", icon: BookOpen },
     { href: "/student/enrollments", label: "My Enrollments", icon: GraduationCap },
     { href: "/student/results", label: "Academic Results", icon: FileText },
+    { href: "/student/academic-standing", label: "Academic Standing", icon: Award },
     { href: "/student/payments", label: "Fee Payments", icon: CreditCard },
     { href: "/student/notifications", label: "Notifications", icon: Bell },
     { href: "/student/profile", label: "My Profile", icon: UserIcon },
@@ -28,6 +29,7 @@ const ROLE_LINKS = {
     { href: "/admin/students", label: "Students", icon: Users },
     { href: "/admin/lecturers", label: "Lecturers", icon: GraduationCap },
     { href: "/admin/results", label: "All Results", icon: FileText },
+    { href: "/admin/academic-standing", label: "Academic Standings", icon: Award },
     { href: "/admin/payments", label: "Payments & Fees", icon: DollarSign },
     { href: "/admin/sessions", label: "Academic Sessions", icon: CalendarDays },
     { href: "/admin/notifications", label: "Notifications", icon: Bell },
@@ -45,7 +47,7 @@ export function Sidebar() {
 
   return (
     <div className="w-64 bg-primary text-primary-foreground h-full flex flex-col hidden md:flex shrink-0">
-      <div className="p-6 pb-4">
+      <div className="p-5 pb-3">
         <h1 className="text-xl font-bold tracking-tight leading-tight">MAAUN</h1>
         <p className="text-primary-foreground/70 text-[10px] mt-0.5 uppercase tracking-wider font-medium">
           Management Portal
@@ -59,7 +61,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-2">
         {links.map((link) => {
           const Icon = link.icon;
           const isActive = location === link.href || location.startsWith(link.href + "/");

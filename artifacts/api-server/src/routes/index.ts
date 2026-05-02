@@ -11,6 +11,7 @@ import sessionsRouter from "./sessions";
 import paymentsRouter from "./payments";
 import notificationsRouter from "./notifications";
 import activityLogsRouter from "./activity-logs";
+import academicStandingRouter from "./academic-standing";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(sessionsRouter);
 router.use(paymentsRouter);
 router.use(notificationsRouter);
 router.use(activityLogsRouter);
+router.use(academicStandingRouter);
 
 export default router;
