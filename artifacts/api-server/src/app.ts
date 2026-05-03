@@ -26,7 +26,16 @@ app.use(
   }),
 );
 app.use(cors());
-app.use(express.json());
+
+// Capture raw body buffer for Paystack webhook signature verification.
+// Must be done inside express.json's verify function so it runs before parsing.
+app.use(
+  express.json({
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);

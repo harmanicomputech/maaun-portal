@@ -1,0 +1,112 @@
+PHASE 39: Payment System Hardening + Financial Integrity Validation
+
+OBJECTIVE:
+Stabilize and audit the entire payment system (Paystack, receipts, ledger, fees) before adding any new payment UI or flows.
+
+DO NOT introduce new features.
+ONLY verify, secure, and correct existing financial logic.
+
+--------------------------------------------------
+1. END-TO-END PAYMENT FLOW AUDIT
+--------------------------------------------------
+
+Trace full flow:
+
+Paystack → webhook/verify → receipts → ledger → finance dashboard → student receipts page
+
+Verify:
+
+- no duplicate ledger entries
+- no duplicate receipts
+- idempotency enforced on reference
+
+--------------------------------------------------
+2. WEBHOOK RELIABILITY CHECK
+--------------------------------------------------
+
+Ensure:
+
+- charge.success is the only processed event
+- signature verification is strict
+- invalid events are ignored safely
+- retries do not duplicate records
+
+--------------------------------------------------
+3. LEDGER INTEGRITY CHECK
+--------------------------------------------------
+
+Verify:
+
+- every credit has matching receipt
+- balance_after is always correct
+- no negative or broken balances
+- reversal logic is consistent
+
+--------------------------------------------------
+4. PAYMENT STATE CONSISTENCY
+--------------------------------------------------
+
+Ensure:
+
+- pending → confirmed → reversed flow is consistent
+- no record can skip states
+- reversed payments correctly adjust ledger
+
+--------------------------------------------------
+5. SECURITY HARDENING
+--------------------------------------------------
+
+- prevent replay attacks on webhook
+- validate Paystack signature properly
+- block manual fake API payment inserts
+- ensure only bursar/admin can modify financial records
+
+--------------------------------------------------
+6. DATA VALIDATION FIXES (IF ANY)
+--------------------------------------------------
+
+Check:
+
+- null amounts
+- invalid references
+- missing student IDs
+- orphaned receipts
+
+Fix all inconsistencies
+
+--------------------------------------------------
+7. FINANCE DASHBOARD ACCURACY CHECK
+--------------------------------------------------
+
+Verify:
+
+- totals match ledger sum
+- monthly revenue is correct
+- fee breakdown matches receipts
+- no frontend/backend mismatch
+
+--------------------------------------------------
+8. SYSTEM TEST (PAYMENT ONLY)
+--------------------------------------------------
+
+Run simulation:
+
+- 1 successful payment
+- 1 duplicate webhook call
+- 1 reversed payment
+- 1 failed/invalid webhook
+
+Expected:
+
+- no duplication
+- correct ledger updates
+- correct receipt states
+
+--------------------------------------------------
+END RESULT:
+
+A fully production-safe financial system:
+- webhook-safe
+- duplication-proof
+- ledger-consistent
+- audit-ready

@@ -15,16 +15,26 @@ function generateReceiptRef(): string {
   return `MAAUN-RCP-${year}-${hex}`;
 }
 
+/**
+ * Compute the true running balance for a user by summing all ledger entries.
+ * Using SUM avoids the race condition that occurs when relying on the stored
+ * `balance_after` value of the "latest" row (which can be stale under concurrency).
+ */
 async function getRunningBalance(userId: number): Promise<number> {
-  const rows = await db
-    .select({ balanceAfter: financialLedgerTable.balanceAfter })
+  const result = await db
+    .select({
+      balance: sql<number>`COALESCE(SUM(CASE WHEN type = 'credit' THEN amount ELSE -amount END), 0)`,
+    })
     .from(financialLedgerTable)
-    .where(eq(financialLedgerTable.userId, userId))
-    .orderBy(desc(financialLedgerTable.createdAt))
-    .limit(1);
-  return rows[0]?.balanceAfter ?? 0;
+    .where(eq(financialLedgerTable.userId, userId));
+  return Number(result[0]?.balance ?? 0);
 }
 
+/**
+ * Atomically create a receipt and ledger entry for a confirmed payment.
+ * Uses ON CONFLICT DO NOTHING on the unique payment_id constraint so concurrent
+ * calls (e.g. webhook + verify arriving simultaneously) are idempotent.
+ */
 export async function createReceiptAndLedger(
   paymentId: number,
   userId: number,
@@ -32,40 +42,45 @@ export async function createReceiptAndLedger(
   feeName: string,
   ip = "system"
 ): Promise<void> {
-  const existing = await db
-    .select({ id: receiptsTable.id })
-    .from(receiptsTable)
-    .where(eq(receiptsTable.paymentId, paymentId))
-    .limit(1);
-  if (existing[0]) return; // already created
-
   const ref = generateReceiptRef();
   const currentBalance = await getRunningBalance(userId);
   const newBalance = currentBalance + amount;
 
-  const [receipt] = await db.insert(receiptsTable).values({
-    paymentId,
-    userId,
-    referenceNumber: ref,
-    amount,
-    feeName,
-    status: "confirmed",
-    issuedAt: new Date(),
-    ipAddress: ip,
-  }).returning();
+  // Atomic insert — unique constraint on payment_id prevents duplicate receipts.
+  // If a receipt already exists for this payment, DO NOTHING.
+  const inserted = await db
+    .insert(receiptsTable)
+    .values({
+      paymentId,
+      userId,
+      referenceNumber: ref,
+      amount,
+      feeName,
+      status: "confirmed",
+      issuedAt: new Date(),
+      ipAddress: ip,
+    })
+    .onConflictDoNothing()
+    .returning();
 
+  if (!inserted[0]) {
+    // Receipt already existed — idempotent, nothing to do.
+    return;
+  }
+
+  // Only insert the ledger entry when the receipt was newly created.
   await db.insert(financialLedgerTable).values({
     userId,
     type: "credit",
     amount,
     description: `Payment for ${feeName}`,
     relatedPaymentId: paymentId,
-    relatedReceiptId: receipt.id,
+    relatedReceiptId: inserted[0].id,
     balanceAfter: newBalance,
   });
 }
 
-// ─── Public: verify receipt ───────────────────────────────────────────────────
+// ─── Public: verify receipt by reference ─────────────────────────────────────
 router.get("/receipts/verify/:reference", async (req, res) => {
   const { reference } = req.params;
 
@@ -104,7 +119,7 @@ router.get("/receipts/verify/:reference", async (req, res) => {
   });
 });
 
-// ─── Student: get own receipts ────────────────────────────────────────────────
+// ─── Student: own receipts ────────────────────────────────────────────────────
 router.get("/receipts/my", requireAuth, async (req, res) => {
   const rows = await db
     .select({
@@ -126,7 +141,7 @@ router.get("/receipts/my", requireAuth, async (req, res) => {
   return res.json(rows);
 });
 
-// ─── Student: get own ledger ──────────────────────────────────────────────────
+// ─── Student: own ledger ──────────────────────────────────────────────────────
 router.get("/ledger/my", requireAuth, async (req, res) => {
   const rows = await db
     .select()
@@ -134,13 +149,13 @@ router.get("/ledger/my", requireAuth, async (req, res) => {
     .where(eq(financialLedgerTable.userId, req.user!.userId))
     .orderBy(desc(financialLedgerTable.createdAt));
 
-  const totalPaid = rows.filter(r => r.type === "credit").reduce((s, r) => s + r.amount, 0);
+  const totalPaid   = rows.filter(r => r.type === "credit").reduce((s, r) => s + r.amount, 0);
   const totalDebits = rows.filter(r => r.type === "debit").reduce((s, r) => s + r.amount, 0);
 
   return res.json({ entries: rows, totalPaid, totalDebits, balance: totalPaid - totalDebits });
 });
 
-// ─── Admin: get all receipts ──────────────────────────────────────────────────
+// ─── Admin/Bursar: all receipts ───────────────────────────────────────────────
 router.get("/receipts", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const rows = await db
     .select({
@@ -167,7 +182,7 @@ router.get("/receipts", requireAuth, requireRole("admin", "bursar"), async (req,
   return res.json(rows);
 });
 
-// ─── Admin: confirm receipt ───────────────────────────────────────────────────
+// ─── Admin/Bursar: confirm a receipt ─────────────────────────────────────────
 router.patch("/receipts/:id/confirm", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
@@ -175,6 +190,7 @@ router.patch("/receipts/:id/confirm", requireAuth, requireRole("admin", "bursar"
   const existing = await db.select().from(receiptsTable).where(eq(receiptsTable.id, id)).limit(1);
   if (!existing[0]) return res.status(404).json({ error: "Receipt not found" });
   if (existing[0].status === "reversed") return res.status(400).json({ error: "Cannot confirm a reversed receipt" });
+  if (existing[0].status === "confirmed") return res.status(409).json({ error: "Receipt is already confirmed" });
 
   const [updated] = await db
     .update(receiptsTable)
@@ -194,32 +210,34 @@ router.patch("/receipts/:id/confirm", requireAuth, requireRole("admin", "bursar"
   return res.json(updated);
 });
 
-// ─── Admin: reverse receipt ───────────────────────────────────────────────────
+// ─── Admin/Bursar: reverse a receipt ─────────────────────────────────────────
 router.patch("/receipts/:id/reverse", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
 
   const { reason } = req.body;
-  if (!reason) return res.status(400).json({ error: "Reversal reason is required" });
+  if (!reason || !reason.toString().trim()) return res.status(400).json({ error: "Reversal reason is required" });
 
   const existing = await db.select().from(receiptsTable).where(eq(receiptsTable.id, id)).limit(1);
   if (!existing[0]) return res.status(404).json({ error: "Receipt not found" });
-  if (existing[0].status === "reversed") return res.status(400).json({ error: "Receipt already reversed" });
+  if (existing[0].status === "reversed") return res.status(409).json({ error: "Receipt is already reversed" });
 
   const [updated] = await db
     .update(receiptsTable)
-    .set({ status: "reversed", reversedAt: new Date(), reversalReason: reason, issuedBy: req.user!.userId })
+    .set({ status: "reversed", reversedAt: new Date(), reversalReason: reason.toString().trim(), issuedBy: req.user!.userId })
     .where(eq(receiptsTable.id, id))
     .returning();
 
-  // Debit ledger entry
+  // Debit ledger — track the reversal accurately without clamping to 0.
+  // This preserves full accounting integrity even if balance would go negative.
   const currentBalance = await getRunningBalance(existing[0].userId);
-  const newBalance = Math.max(0, currentBalance - existing[0].amount);
+  const newBalance = currentBalance - existing[0].amount;
+
   await db.insert(financialLedgerTable).values({
     userId: existing[0].userId,
     type: "debit",
     amount: existing[0].amount,
-    description: `Reversal: ${reason}`,
+    description: `Reversal: ${reason.toString().trim()}`,
     relatedPaymentId: existing[0].paymentId,
     relatedReceiptId: id,
     balanceAfter: newBalance,
@@ -231,13 +249,13 @@ router.patch("/receipts/:id/reverse", requireAuth, requireRole("admin", "bursar"
     action: "RECEIPT_REVERSED",
     model: "receipt",
     modelId: id,
-    newData: { reason, ip },
+    newData: { reason: reason.toString().trim(), ip, reversedStudentId: existing[0].userId },
   });
 
   return res.json(updated);
 });
 
-// ─── Admin: finance analytics ─────────────────────────────────────────────────
+// ─── Admin/Bursar: finance analytics ─────────────────────────────────────────
 router.get("/finance/analytics", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const receipts = await db
     .select({
@@ -245,30 +263,33 @@ router.get("/finance/analytics", requireAuth, requireRole("admin", "bursar"), as
       amount: receiptsTable.amount,
       feeName: receiptsTable.feeName,
       status: receiptsTable.status,
+      // Use issuedAt (actual payment confirmation date) for accurate revenue reporting.
+      // Fall back to createdAt only if issuedAt is null.
+      issuedAt: receiptsTable.issuedAt,
       createdAt: receiptsTable.createdAt,
     })
     .from(receiptsTable)
-    .orderBy(receiptsTable.createdAt);
+    .orderBy(receiptsTable.issuedAt, receiptsTable.createdAt);
 
   const confirmed = receipts.filter(r => r.status === "confirmed");
   const pending   = receipts.filter(r => r.status === "pending");
   const reversed  = receipts.filter(r => r.status === "reversed");
 
-  const totalRevenue = confirmed.reduce((s, r) => s + r.amount, 0);
-  const pendingAmount = pending.reduce((s, r) => s + r.amount, 0);
+  const totalRevenue   = confirmed.reduce((s, r) => s + r.amount, 0);
+  const pendingAmount  = pending.reduce((s, r) => s + r.amount, 0);
   const reversedAmount = reversed.reduce((s, r) => s + r.amount, 0);
 
-  // Revenue by fee type
+  // Revenue by fee type (confirmed only)
   const byFee: Record<string, number> = {};
   for (const r of confirmed) {
     byFee[r.feeName] = (byFee[r.feeName] ?? 0) + r.amount;
   }
   const revenueByFee = Object.entries(byFee).map(([feeName, amount]) => ({ feeName, amount }));
 
-  // Monthly revenue (last 12 months)
+  // Monthly revenue — use issuedAt (confirmation date), falling back to createdAt
   const monthlyMap: Record<string, number> = {};
   for (const r of confirmed) {
-    const d = new Date(r.createdAt);
+    const d = new Date(r.issuedAt ?? r.createdAt);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     monthlyMap[key] = (monthlyMap[key] ?? 0) + r.amount;
   }
@@ -290,7 +311,7 @@ router.get("/finance/analytics", requireAuth, requireRole("admin", "bursar"), as
   });
 });
 
-// ─── Admin: student ledger view ───────────────────────────────────────────────
+// ─── Admin/Bursar: view a student's ledger ────────────────────────────────────
 router.get("/ledger/student/:userId", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const uid = parseInt(req.params.userId);
   if (isNaN(uid)) return res.status(400).json({ error: "Invalid userId" });

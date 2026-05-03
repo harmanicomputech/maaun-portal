@@ -19,20 +19,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   counsellor: [
     "view_assigned_welfare_cases", "manage_welfare_cases",
     "add_private_notes", "add_shared_notes", "close_welfare_cases",
-  ],
-  bursar: [
-    "view_payments", "confirm_payments", "reverse_payments", "view_financial_reports",
-  ],
-  registrar: [
-    "approve_results", "approve_graduation", "view_courses", "manage_courses",
-    "view_transcripts",
-  ],
-  hod: [
-    "view_courses", "manage_courses", "enter_results", "approve_results", "view_timetable",
-  ],
-  counsellor: [
-    "view_assigned_welfare_cases", "manage_welfare_cases",
-    "add_private_notes", "add_shared_notes", "close_welfare_cases",
     "view_announcements",
   ],
   bursar: [

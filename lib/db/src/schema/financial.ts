@@ -4,7 +4,9 @@ import { paymentsTable, feesTable } from "./fees";
 
 export const receiptsTable = pgTable("receipts", {
   id: serial("id").primaryKey(),
-  paymentId: integer("payment_id").notNull().references(() => paymentsTable.id, { onDelete: "cascade" }),
+  // UNIQUE enforces exactly one receipt per payment at the DB level.
+  // createReceiptAndLedger uses ON CONFLICT DO NOTHING for atomic idempotency.
+  paymentId: integer("payment_id").notNull().unique().references(() => paymentsTable.id, { onDelete: "cascade" }),
   userId: integer("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   referenceNumber: text("reference_number").notNull().unique(),
   amount: integer("amount").notNull(),
