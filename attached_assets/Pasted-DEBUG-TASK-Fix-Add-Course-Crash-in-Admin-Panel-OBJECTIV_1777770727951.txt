@@ -1,0 +1,152 @@
+DEBUG TASK: Fix “Add Course” Crash in Admin Panel
+
+OBJECTIVE:
+Diagnose and fix the error that occurs when an admin tries to create a new course from the "Manage Courses" page. The system currently shows: "artifact encountered an error".
+
+IMPORTANT:
+Do NOT guess. You must trace the actual failure point step-by-step.
+
+--------------------------------------------------
+STEP 1: ENABLE FULL ERROR VISIBILITY
+--------------------------------------------------
+
+1. Ensure backend is running in development mode
+2. Add global error logging:
+   - Log all uncaught exceptions
+   - Log all API errors with stack trace
+
+3. In course creation controller:
+   - Log incoming request body
+   - Wrap logic in try/catch
+   - Return actual error message in response
+
+Example:
+- console.log("COURSE PAYLOAD:", req.body)
+- console.error("COURSE ERROR:", err)
+
+--------------------------------------------------
+STEP 2: TRACE THE FULL FLOW
+--------------------------------------------------
+
+Trace this exact flow:
+
+Frontend form → API request → backend controller → database insert
+
+Identify:
+
+- What payload is being sent?
+- What does backend expect?
+- Where does it break?
+
+--------------------------------------------------
+STEP 3: VERIFY FRONTEND FORM
+--------------------------------------------------
+
+Check:
+
+- All required fields exist:
+  - course code
+  - title
+  - unit
+  - departmentId
+
+- Ensure:
+  - IDs are sent (NOT names/strings)
+  - No undefined/null values
+
+Fix any mismatch.
+
+--------------------------------------------------
+STEP 4: VERIFY API ROUTE
+--------------------------------------------------
+
+Confirm:
+
+- Frontend is calling correct endpoint:
+  POST /api/courses
+
+- Backend route exists and is registered
+
+--------------------------------------------------
+STEP 5: VERIFY PERMISSIONS (RBAC)
+--------------------------------------------------
+
+Check:
+
+- Admin role has permission:
+  "manage_courses"
+
+If missing:
+- add it to permission map
+
+--------------------------------------------------
+STEP 6: VERIFY DATABASE CONSTRAINTS
+--------------------------------------------------
+
+Check course table:
+
+- required fields (NOT NULL)
+- foreign keys:
+  - department_id must exist
+
+Fix:
+- invalid IDs
+- missing relations
+
+--------------------------------------------------
+STEP 7: IDENTIFY ROOT ERROR
+--------------------------------------------------
+
+Output:
+
+- Exact error message
+- File + line where it occurs
+- Whether it's:
+  - frontend bug
+  - backend validation
+  - DB constraint
+  - permission issue
+
+--------------------------------------------------
+STEP 8: FIX THE ISSUE
+--------------------------------------------------
+
+Apply proper fix:
+
+- correct payload structure
+- fix null values
+- fix API mismatch
+- fix DB insert
+- fix permission check
+
+--------------------------------------------------
+STEP 9: VERIFY FIX
+--------------------------------------------------
+
+Test:
+
+- Create a course successfully
+- No console errors
+- No 500 response
+- Course appears in list
+
+--------------------------------------------------
+STEP 10: ADD SAFE ERROR HANDLING (IMPORTANT)
+--------------------------------------------------
+
+Ensure:
+
+- User sees friendly message:
+  "Failed to create course"
+
+- System logs real error internally
+
+--------------------------------------------------
+FINAL OUTPUT:
+--------------------------------------------------
+
+Return:
+
+1. Root cause of the error
+2. Exact fix applied
+3. Confirmation that course creation works

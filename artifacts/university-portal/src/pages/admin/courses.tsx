@@ -13,7 +13,7 @@ import { Plus, Pencil, Trash2, Loader2, Search, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type CourseForm = { courseCode: string; title: string; unit: string; department: string; faculty: string; level: string; semester: string; description: string; lecturerId: string };
-const emptyForm: CourseForm = { courseCode: "", title: "", unit: "3", department: "", faculty: "", level: "100", semester: "first", description: "", lecturerId: "" };
+const emptyForm: CourseForm = { courseCode: "", title: "", unit: "3", department: "", faculty: "", level: "100", semester: "first", description: "", lecturerId: "none" };
 
 export default function AdminCourses() {
   const { toast } = useToast();
@@ -53,12 +53,12 @@ export default function AdminCourses() {
 
   const openEdit = (course: any) => {
     setEditing(course.id);
-    setForm({ courseCode: course.courseCode, title: course.title, unit: String(course.unit), department: course.department, faculty: course.faculty, level: course.level, semester: course.semester, description: course.description || "", lecturerId: String(course.lecturerId || "") });
+    setForm({ courseCode: course.courseCode, title: course.title, unit: String(course.unit), department: course.department, faculty: course.faculty, level: course.level, semester: course.semester, description: course.description || "", lecturerId: course.lecturerId ? String(course.lecturerId) : "none" });
     setDialogOpen(true);
   };
 
   const handleSubmit = () => {
-    const data = { courseCode: form.courseCode, title: form.title, unit: parseInt(form.unit), department: form.department, faculty: form.faculty, level: form.level, semester: form.semester as "first" | "second", description: form.description || undefined, lecturerId: form.lecturerId ? parseInt(form.lecturerId) : undefined };
+    const data = { courseCode: form.courseCode, title: form.title, unit: parseInt(form.unit), department: form.department, faculty: form.faculty, level: form.level, semester: form.semester as "first" | "second", description: form.description || undefined, lecturerId: (form.lecturerId && form.lecturerId !== "none") ? parseInt(form.lecturerId) : undefined };
     if (editing !== null) updateMutation.mutate({ id: editing, data });
     else createMutation.mutate({ data });
   };
@@ -149,7 +149,7 @@ export default function AdminCourses() {
               <Select value={form.lecturerId} onValueChange={(v) => setForm(f => ({ ...f, lecturerId: v }))}>
                 <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {lecturers.map(l => <SelectItem key={l.id} value={String(l.id)}>{l.name}</SelectItem>)}
                 </SelectContent>
               </Select>
