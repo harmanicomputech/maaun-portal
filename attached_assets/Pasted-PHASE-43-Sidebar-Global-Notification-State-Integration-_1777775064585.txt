@@ -1,0 +1,90 @@
+PHASE 43: Sidebar + Global Notification State Integration (Safe Implementation)
+
+OBJECTIVE:
+Integrate the existing UnifiedDashboardStateEngine into the UI layer by adding role-aware notification indicators to the sidebar and header WITHOUT duplicating state, polling, or API calls.
+
+DO NOT modify routing, layout structure, or sidebar behavior.
+ONLY enhance UI indicators using existing state engine.
+
+--------------------------------------------------
+1. GLOBAL STATE HOOK INTEGRATION
+--------------------------------------------------
+
+Use UnifiedDashboardStateEngine as the single source of truth:
+
+DO NOT create new polling or API calls.
+
+Consume:
+
+- unreadCounts
+- notifications
+- dashboardStats
+
+--------------------------------------------------
+2. SIDEBAR BADGE SYSTEM
+--------------------------------------------------
+
+Add badge indicators next to:
+
+- Welfare (counsellor, student)
+- Finance (bursar, student)
+- Results (lecturer, student, dean)
+- Disciplinary (counsellor, admin)
+- Hostel (student, admin)
+- Graduation (registrar, dean, student)
+
+Rules:
+
+- show badge only if count > 0
+- max display: "9+" for overflow
+- animate pulse when count increases
+- color by priority:
+  - red = urgent (disciplinary, financial blocks)
+  - amber = warnings (probation, pending approvals)
+  - blue = informational (results, announcements)
+
+--------------------------------------------------
+3. MOBILE HAMBURGER BADGE
+--------------------------------------------------
+
+Add unread indicator dot to hamburger button:
+
+- small red dot top-right corner
+- only visible if ANY unread count > 0 across all categories
+- subtle pulse animation
+
+--------------------------------------------------
+4. TOP HEADER BELL INTEGRATION
+--------------------------------------------------
+
+Ensure bell icon:
+
+- uses same unread state source
+- shows total unread count
+- syncs with sidebar state (no duplication)
+
+--------------------------------------------------
+5. STATE CONSISTENCY RULES
+--------------------------------------------------
+
+- sidebar and header MUST reflect same state instantly
+- no separate API calls per component
+- updates must propagate globally from engine only
+- no per-page polling allowed
+
+--------------------------------------------------
+6. PERFORMANCE SAFETY
+--------------------------------------------------
+
+- memoize badge calculations
+- avoid re-render loops
+- debounce state updates if needed
+
+--------------------------------------------------
+END RESULT:
+
+- Sidebar shows live role-aware badges
+- Mobile hamburger shows unread indicator
+- Header bell stays synced
+- No duplicate state sources
+- Fully unified notification UI layer

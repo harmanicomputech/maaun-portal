@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { Sidebar } from "./sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationBell } from "./notification-bell";
@@ -39,6 +40,10 @@ export function TopHeader() {
   const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // Consume the shared notification state — no new API calls.
+  const { unreadCount } = useNotifications();
+  const hasUnread = unreadCount > 0;
+
   const getPageTitle = () => {
     const segments = location.split("/").filter(Boolean);
     const last = segments[segments.length - 1] ?? "";
@@ -54,30 +59,35 @@ export function TopHeader() {
 
   return (
     <header className="h-16 border-b bg-card/90 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-10">
-      {/* Left: mobile menu trigger + page title */}
+      {/* Left: mobile hamburger + page title */}
       <div className="flex items-center gap-3">
-        {/* Hamburger — visible on mobile only */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open navigation menu"
-        >
-          <Menu className="w-5 h-5" />
-        </Button>
+        {/* Hamburger — mobile only, with unread dot indicator */}
+        <div className="relative md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setDrawerOpen(true)}
+            aria-label={`Open navigation menu${hasUnread ? ` (${unreadCount} unread)` : ""}`}
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+
+          {/* Unread indicator dot — appears when any unread notification exists */}
+          {hasUnread && (
+            <span
+              className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-background animate-pulse pointer-events-none"
+              aria-hidden
+            />
+          )}
+        </div>
 
         {/* Mobile slide-in drawer */}
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetContent
             side="left"
             className="p-0 w-64 bg-primary border-0"
-            aria-label="Navigation menu"
           >
-            {/*
-              Pass mobile=true so Sidebar renders without its own hidden md:flex class.
-              Pass onClose so clicking any nav link closes the drawer.
-            */}
+            <SheetTitle className="sr-only">Navigation menu</SheetTitle>
             <Sidebar mobile onClose={() => setDrawerOpen(false)} />
           </SheetContent>
         </Sheet>
@@ -94,6 +104,7 @@ export function TopHeader() {
 
       {/* Right: bell + user avatar */}
       <div className="flex items-center gap-2">
+        {/* Bell already uses NotificationContext internally — no duplication */}
         {user && <NotificationBell />}
 
         {user && (

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
@@ -12,6 +13,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+// ─── Nav link definitions ─────────────────────────────────────────────────────
 
 const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> = {
   student: [
@@ -127,21 +131,90 @@ const ROLE_DISPLAY: Record<string, { label: string; color: string }> = {
   super_admin: { label: "Super Admin",  color: "text-red-300" },
 };
 
+// ─── Badge config ─────────────────────────────────────────────────────────────
+// Maps each nav link href to the notification types that count toward its badge,
+// and the priority colour. Derived purely from the existing NotificationContext —
+// no new API calls.
+
+type BadgeColor = "red" | "amber" | "blue";
+const ALL_TYPES = ["info","warning","result","payment","enrollment","success"] as const;
+
+const LINK_BADGE_CFG: Record<string, { types: readonly string[]; color: BadgeColor }> = {
+  // Results — blue
+  "/student/results":          { types: ["result"],        color: "blue" },
+  "/lecturer/results":         { types: ["result"],        color: "blue" },
+  "/hod/results":              { types: ["result"],        color: "blue" },
+  "/dean/results":             { types: ["result"],        color: "blue" },
+  "/registrar/results":        { types: ["result"],        color: "blue" },
+  "/admin/results":            { types: ["result"],        color: "blue" },
+  // Payments / Finance — amber
+  "/student/payments":         { types: ["payment"],       color: "amber" },
+  "/student/receipts":         { types: ["payment"],       color: "amber" },
+  "/bursar/finance":           { types: ["payment"],       color: "amber" },
+  "/bursar/payments":          { types: ["payment"],       color: "amber" },
+  "/admin/finance":            { types: ["payment"],       color: "amber" },
+  "/admin/payments":           { types: ["payment"],       color: "amber" },
+  // Enrollments — blue
+  "/student/enrollments":      { types: ["enrollment"],    color: "blue" },
+  // Welfare / Disciplinary — red (urgent)
+  "/student/welfare":          { types: ["warning"],       color: "red" },
+  "/counsellor/welfare":       { types: ["warning"],       color: "red" },
+  "/admin/welfare":            { types: ["warning"],       color: "red" },
+  "/student/disciplinary":     { types: ["warning"],       color: "red" },
+  "/admin/disciplinary":       { types: ["warning"],       color: "red" },
+  // Graduation — blue
+  "/student/graduation":       { types: ["info","success"],color: "blue" },
+  "/registrar/graduation":     { types: ["info","success"],color: "blue" },
+  "/dean/graduation":          { types: ["info","success"],color: "blue" },
+  "/admin/graduation":         { types: ["info","success"],color: "blue" },
+  // Notifications pages — all types, blue
+  "/student/notifications":    { types: ALL_TYPES,         color: "blue" },
+  "/admin/notifications":      { types: ALL_TYPES,         color: "blue" },
+};
+
+const BADGE_CLS: Record<BadgeColor, string> = {
+  red:   "bg-red-500 text-white",
+  amber: "bg-amber-400 text-white",
+  blue:  "bg-blue-500 text-white",
+};
+
+function fmt(n: number): string { return n > 9 ? "9+" : String(n); }
+
+// ─── Props ────────────────────────────────────────────────────────────────────
+
 interface SidebarProps {
-  /**
-   * When true the sidebar fills its container without any visibility hiding classes.
-   * Use this when rendering inside a mobile drawer/sheet.
-   * When false (default) the sidebar is hidden on small screens and visible on md+.
-   */
+  /** When true the sidebar fills its container (used inside mobile drawer). */
   mobile?: boolean;
-  /** Called after a nav link is clicked — use to close the mobile drawer. */
+  /** Called after any nav link click — use to close the mobile drawer. */
   onClose?: () => void;
 }
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Consume the existing NotificationContext — no new polling.
+  const { notifications } = useNotifications();
+
+  // Count unread by notification type — memoised to avoid per-render work.
+  const unreadByType = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const n of notifications) {
+      if (!n.isRead) counts[n.type] = (counts[n.type] ?? 0) + 1;
+    }
+    return counts;
+  }, [notifications]);
+
+  // Badge count for a given href.
+  const getBadge = (href: string): { count: number; color: BadgeColor } | null => {
+    const cfg = LINK_BADGE_CFG[href];
+    if (!cfg) return null;
+    const count = cfg.types.reduce((s, t) => s + (unreadByType[t] ?? 0), 0);
+    return count > 0 ? { count, color: cfg.color } : null;
+  };
 
   if (!user) return null;
 
@@ -149,25 +222,16 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const roleDisplay = ROLE_DISPLAY[user.role] ?? { label: user.role, color: "text-primary-foreground/70" };
   const isSuperAdmin = (user.role as string) === "super_admin";
 
-  const handleLogout = () => {
-    setShowLogoutModal(false);
-    logout();
-  };
-
-  const handleLinkClick = () => {
-    onClose?.();
-  };
+  const handleLogout = () => { setShowLogoutModal(false); logout(); };
+  const handleLinkClick = () => { onClose?.(); };
 
   return (
     <>
-      {/*
-        Desktop:  hidden on < md, shown as flex on md+      (mobile=false)
-        Mobile:   always shown as flex — the Sheet controls visibility  (mobile=true)
-      */}
       <div
-        className={`w-64 bg-primary text-primary-foreground h-full flex flex-col shrink-0 ${
-          mobile ? "flex" : "hidden md:flex"
-        }`}
+        className={cn(
+          "w-64 bg-primary text-primary-foreground h-full flex flex-col shrink-0",
+          mobile ? "flex" : "hidden md:flex",
+        )}
       >
         {/* Logo */}
         <div className="p-5 pb-3">
@@ -184,32 +248,53 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
               <p className="text-sm font-semibold truncate flex-1">{user.name}</p>
               {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-red-300 shrink-0" />}
             </div>
-            <p className={`text-xs mt-0.5 flex items-center gap-1 ${roleDisplay.color}`}>
+            <p className={cn("text-xs mt-0.5 flex items-center gap-1", roleDisplay.color)}>
               {isSuperAdmin && <Scale className="w-2.5 h-2.5" />}
               {roleDisplay.label}
             </p>
           </div>
         </div>
 
-        {/* Nav links — scrollable so long lists never get cut off */}
+        {/* Nav links — scrollable */}
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-2">
           {links.map((link) => {
             const Icon = link.icon;
             const isActive = location === link.href || location.startsWith(link.href + "/");
+            const badge = getBadge(link.href);
+
             return (
               <Link key={link.href} href={link.href} onClick={handleLinkClick}>
                 <div
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 cursor-pointer ${
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 cursor-pointer",
                     isActive
                       ? "bg-white text-primary font-semibold shadow-sm"
-                      : "text-primary-foreground/80 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-primary" : "opacity-80"}`} />
-                  <span className="text-[13px] leading-tight flex-1">{link.label}</span>
-                  {isActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      : "text-primary-foreground/80 hover:bg-white/10 hover:text-white",
                   )}
+                >
+                  <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-primary" : "opacity-80")} />
+
+                  <span className="text-[13px] leading-tight flex-1">{link.label}</span>
+
+                  {/* Badge — shown when there are unread notifications for this section */}
+                  {badge ? (
+                    <span
+                      className={cn(
+                        "text-[9px] font-bold min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center leading-none shrink-0",
+                        isActive
+                          ? badge.color === "red"   ? "bg-red-500 text-white"
+                            : badge.color === "amber" ? "bg-amber-500 text-white"
+                            : "bg-blue-500 text-white"
+                          : badge.color === "red"   ? "bg-red-500 text-white"
+                            : badge.color === "amber" ? "bg-amber-400 text-white"
+                            : "bg-blue-500 text-white",
+                      )}
+                    >
+                      {fmt(badge.count)}
+                    </span>
+                  ) : isActive ? (
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                  ) : null}
                 </div>
               </Link>
             );
@@ -254,18 +339,10 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
           </motion.div>
 
           <DialogFooter className="flex-row gap-2 sm:flex-row">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setShowLogoutModal(false)}
-            >
+            <Button variant="outline" className="flex-1" onClick={() => setShowLogoutModal(false)}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              className="flex-1"
-              onClick={handleLogout}
-            >
+            <Button variant="destructive" className="flex-1" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
               Yes, sign out
             </Button>
