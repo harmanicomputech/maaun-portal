@@ -1,0 +1,143 @@
+PHASE 38: Authentication UX Overhaul (Login, Register, Logout, Password Reset)
+
+OBJECTIVE:
+Redesign and improve ONLY the authentication experience (login, register, logout, password reset) to be more modern, intuitive, and visually polished while preserving all existing backend logic.
+
+DO NOT modify core authentication logic or role system.
+ONLY improve UI/UX, flow, and user experience.
+
+--------------------------------------------------
+1. LOGIN PAGE IMPROVEMENT
+--------------------------------------------------
+
+Enhance existing split layout:
+
+LEFT PANEL:
+- Keep MAAUN branding
+- Add animated gradient background (slow floating blobs or subtle mesh)
+- Add rotating feature highlights (e.g. “Results • Finance • Hostel • Welfare”)
+
+RIGHT PANEL (FORM):
+- Glassmorphism card style (slight blur + soft shadow)
+- Smooth entrance animation (scale + fade)
+- Better spacing and hierarchy
+
+--------------------------------------------------
+2. DEMO LOGIN UX IMPROVEMENT
+--------------------------------------------------
+
+Replace static demo credentials with:
+
+- Clickable role buttons:
+  - Admin
+  - Student
+  - Lecturer
+  - Bursar
+  - Registrar
+  - Counsellor
+  - Dean
+  - HoD
+  - Super Admin
+
+On click:
+- auto-fill email + password
+- subtle animation confirmation (check icon or toast)
+
+--------------------------------------------------
+3. REGISTER PAGE IMPROVEMENT
+--------------------------------------------------
+
+- Match login page design system
+- Step-based form (2-step optional):
+  Step 1: Personal info
+  Step 2: Account credentials
+
+Add:
+- progress indicator bar
+- smoother field grouping
+- better validation UI
+- password strength indicator
+
+--------------------------------------------------
+4. LOGOUT CONFIRMATION FLOW
+--------------------------------------------------
+
+Replace instant logout with confirmation modal:
+
+"Are you sure you want to logout?"
+
+Buttons:
+- Cancel
+- Yes, Logout
+
+If YES:
+- clear session/token
+- redirect to /login
+- add fade-out transition
+
+--------------------------------------------------
+5. RESET PASSWORD FEATURE
+--------------------------------------------------
+
+Add "Forgot Password?" link on login page.
+
+Flow:
+- input email
+- show success message:
+  "If an account exists, reset instructions have been sent"
+
+NOTE:
+- frontend-only mock flow is acceptable (no email service required yet)
+
+--------------------------------------------------
+6. AUTH PAGE ANIMATIONS
+--------------------------------------------------
+
+Apply subtle motion system:
+
+- page fade + slide up
+- form field focus glow animation
+- button hover scale (1.02)
+- loading state spinner inside button
+
+Keep animations smooth and lightweight.
+
+--------------------------------------------------
+7. ERROR + SUCCESS UX IMPROVEMENT
+--------------------------------------------------
+
+Replace raw error text with toast system:
+
+- invalid credentials → "Incorrect email or password"
+- success login → "Welcome back"
+
+Use consistent toast styling across auth pages only.
+
+--------------------------------------------------
+8. VISUAL ENHANCEMENTS
+--------------------------------------------------
+
+- improve typography hierarchy (larger headings, lighter labels)
+- increase whitespace in forms
+- better alignment of labels and inputs
+- unify border radius and shadows
+
+--------------------------------------------------
+9. RESPONSIVENESS
+--------------------------------------------------
+
+Ensure:
+
+- login/register stack properly on mobile
+- no overflow on small screens
+- demo buttons remain accessible
+
+--------------------------------------------------
+END RESULT:
+
+A premium authentication experience:
+- modern SaaS-style login UI
+- smooth animations
+- clear login/logout flow
+- improved onboarding experience
+- visually consistent with rest of portal
