@@ -1,0 +1,96 @@
+PHASE 44: Role-Aware Global Search Engine (Controlled Unified Access Layer)
+
+OBJECTIVE:
+Build a centralized global search system that allows users to search across the MAAUN portal (students, courses, results, announcements, payments, hostel, welfare cases) while strictly respecting role-based permissions and existing backend boundaries.
+
+DO NOT create new data sources.
+DO NOT duplicate API logic.
+ONLY aggregate existing APIs safely.
+
+--------------------------------------------------
+1. CENTRAL SEARCH ENGINE
+--------------------------------------------------
+
+Create a single function:
+
+searchGlobal(query, role)
+
+This function aggregates results from existing endpoints:
+
+- students (admin, hod, dean, registrar)
+- courses (hod, admin, lecturer)
+- results (student, lecturer, dean, registrar)
+- announcements (all roles with filtering)
+- payments/receipts (bursar, student, admin)
+- hostel (student, admin)
+- welfare cases (student, counsellor, admin)
+- disciplinary (counsellor, admin, dean)
+- graduation (registrar, dean, student)
+
+--------------------------------------------------
+2. ROLE-BASED FILTERING (CRITICAL)
+--------------------------------------------------
+
+Each role only sees allowed data:
+
+student → personal + enrolled courses + own results + announcements
+lecturer → assigned courses + students + results
+counsellor → welfare + disciplinary only
+bursar → finance only
+registrar → transcripts + graduation + results
+hod → department scope only
+dean → academic overview only
+admin → full access
+super_admin → full access
+
+--------------------------------------------------
+3. SEARCH RESULT STRUCTURE
+--------------------------------------------------
+
+Standardize all results into:
+
+{
+  type: "student | course | result | announcement | payment | hostel | welfare",
+  title: string,
+  subtitle: string,
+  route: string,
+  accessLevel: role-based flag
+}
+
+--------------------------------------------------
+4. UI INTEGRATION (HEADER SEARCH BAR)
+--------------------------------------------------
+
+Add search input in top header:
+
+- debounce input (300ms)
+- show dropdown results
+- keyboard navigation support
+- Enter → navigate to first result
+- Esc → close dropdown
+
+--------------------------------------------------
+5. PERFORMANCE RULES
+--------------------------------------------------
+
+- cache recent queries per role
+- no repeated API calls for same query
+- limit results per category (max 5 each)
+- lazy-load heavy categories (finance, results)
+
+--------------------------------------------------
+6. SECURITY RULES
+--------------------------------------------------
+
+- never expose unauthorized records in search
+- enforce backend permission checks (not just frontend filtering)
+- sanitize all query inputs
+
+--------------------------------------------------
+END RESULT:
+
+A unified institutional search system that:
+- respects role permissions
+- reuses existing backend systems
+- improves navigation efficiency
+- does NOT duplicate data layers

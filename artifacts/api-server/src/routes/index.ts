@@ -22,6 +22,7 @@ import appealsRouter from "./appeals";
 import welfareRouter from "./welfare";
 import userManagementRouter from "./user-management";
 import announcementsRouter from "./announcements";
+import searchRouter from "./search";
 
 const router: IRouter = Router();
 
@@ -48,5 +49,6 @@ router.use(appealsRouter);
 router.use(welfareRouter);
 router.use(userManagementRouter);
 router.use(announcementsRouter);
+router.use(searchRouter);
 
 export default router;

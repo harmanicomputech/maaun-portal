@@ -8,6 +8,7 @@ import { useNotifications } from "@/contexts/NotificationContext";
 import { Sidebar } from "./sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationBell } from "./notification-bell";
+import { GlobalSearch } from "./global-search";
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard:           "Dashboard",
@@ -102,8 +103,11 @@ export function TopHeader() {
         </div>
       </div>
 
-      {/* Right: bell + user avatar */}
+      {/* Right: search + bell + user avatar */}
       <div className="flex items-center gap-2">
+        {/* Global search — manages its own open state and Ctrl+K shortcut */}
+        {user && <GlobalSearch />}
+
         {/* Bell already uses NotificationContext internally — no duplication */}
         {user && <NotificationBell />}
 
