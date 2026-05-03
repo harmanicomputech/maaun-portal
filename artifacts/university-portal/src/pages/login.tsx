@@ -83,7 +83,6 @@ export default function Login() {
       onSuccess: (data) => {
         const role  = (data.user.role ?? "").toLowerCase().trim();
         const route = getDashboardRoute(role);
-        console.log("[MAAUN] ROLE:", role, "| REDIRECTING TO:", route);
         toast.success("Welcome back!", { description: "Redirecting to your dashboard…" });
         setTimeout(() => {
           login(data.token);

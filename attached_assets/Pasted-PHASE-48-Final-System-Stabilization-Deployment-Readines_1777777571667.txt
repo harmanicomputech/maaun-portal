@@ -1,0 +1,118 @@
+PHASE 48: Final System Stabilization & Deployment Readiness
+
+OBJECTIVE:
+Prepare the MAAUN University Portal for production deployment.
+No new features are allowed.
+Only stabilization, cleanup, and deployment readiness fixes.
+
+--------------------------------------------------
+1. FULL LOG AUDIT
+--------------------------------------------------
+
+Scan entire system for:
+
+- console errors
+- network failed requests
+- React warnings
+- hydration mismatches
+- undefined/null runtime crashes
+- API 4xx/5xx patterns
+
+Return a categorized list:
+- Critical (must fix before deploy)
+- Medium (non-blocking but risky)
+- Minor (UI polish only)
+
+--------------------------------------------------
+2. ROUTE COMPLETENESS CHECK
+--------------------------------------------------
+
+Verify:
+
+- every sidebar link resolves to a valid route
+- no orphan routes exist in App.tsx
+- no duplicate dashboard routes
+- no /undefined or fallback redirects in production path
+
+--------------------------------------------------
+3. ROLE SECURITY FINAL AUDIT
+--------------------------------------------------
+
+Confirm strict isolation:
+
+- student cannot access /admin /bursar /hod /dean /registrar
+- lecturer restricted to lecturer scope only
+- counsellor cannot access finance/academic admin tools
+- bursar restricted to finance only
+- dean/HoD cannot access system admin tools unless allowed
+- super_admin only bypasses all
+
+Also verify:
+- frontend route guards match backend enforcement
+- no UI-only security assumptions exist
+
+--------------------------------------------------
+4. DATA INTEGRITY FINAL CHECK
+--------------------------------------------------
+
+Ensure:
+
+- no duplicate enrollments
+- no orphan results without courses
+- no payments without receipts
+- no ledger imbalance mismatches
+- no broken foreign key references
+- no null-critical fields in production tables
+
+--------------------------------------------------
+5. PERFORMANCE VALIDATION
+
+Measure:
+
+- initial dashboard load time
+- API response time for:
+  - /dashboard
+  - /notifications
+  - /academic-standing
+  - /calendar
+
+Ensure:
+- no repeated unnecessary fetch loops
+- React Query cache is functioning correctly
+- no infinite re-renders in dashboard widgets
+
+--------------------------------------------------
+6. BUILD READINESS CHECK
+
+Verify:
+
+- frontend build succeeds (no TypeScript errors)
+- backend starts cleanly
+- environment variables are complete
+- database migrations are stable
+- seed data is optional only (not required for runtime)
+
+--------------------------------------------------
+7. SECURITY HARDENING
+
+Confirm:
+
+- no exposed debug logs in production build
+- no sensitive data in API responses (tokens, internal IDs)
+- proper authentication required on all protected endpoints
+- no bypass via direct API calls
+
+--------------------------------------------------
+8. FINAL OUTPUT FORMAT
+
+Return:
+
+- DEPLOYMENT STATUS: READY / NOT READY
+- list of critical issues (if any)
+- list of fixes required before deployment
+- final risk assessment score (0–100)
+
+--------------------------------------------------
+END GOAL:
+This is the final gate before production deployment.
+No new features are allowed beyond this point.

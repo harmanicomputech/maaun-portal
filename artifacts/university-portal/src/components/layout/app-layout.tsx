@@ -45,7 +45,6 @@ export function AppLayout({ children, requireAuth = true }: { children: ReactNod
   if (user) {
     const allowedRoles = getAllowedRoles(location);
     if (allowedRoles && !allowedRoles.includes(user.role)) {
-      console.warn(`[MAAUN] Role "${user.role}" attempted "${location}" → redirecting to ${getDashboardRoute(user.role)}`);
       return <Redirect to={getDashboardRoute(user.role)} />;
     }
   }

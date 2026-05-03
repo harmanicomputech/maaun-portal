@@ -83,7 +83,6 @@ export default function Register() {
       onSuccess: (data) => {
         const role  = (data.user.role ?? "").toLowerCase().trim();
         const route = getDashboardRoute(role);
-        console.log("[MAAUN] ROLE:", role, "| REDIRECTING TO:", route);
         toast.success("Account created!", { description: "Welcome to MAAUN Portal." });
         setTimeout(() => {
           login(data.token);

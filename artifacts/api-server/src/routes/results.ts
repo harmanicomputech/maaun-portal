@@ -41,7 +41,22 @@ async function enrichResult(r: typeof resultsTable.$inferSelect) {
 }
 
 router.get("/results", requireAuth, async (req, res) => {
+  const role = req.user?.role;
   const { studentId, courseId, semester, academicYear, status } = req.query;
+
+  // Students can only view their own results — enforce this regardless of query params
+  if (role === "student") {
+    const [student] = await db.select().from(studentsTable).where(eq(studentsTable.userId, req.user!.userId)).limit(1);
+    if (!student) return res.status(403).json({ error: "Student profile not found" });
+    let rows = await db.select().from(resultsTable).where(eq(resultsTable.studentId, student.id));
+    if (courseId) rows = rows.filter(r => r.courseId === parseInt(courseId as string));
+    if (semester) rows = rows.filter(r => r.semester === semester);
+    if (academicYear) rows = rows.filter(r => r.academicYear === academicYear);
+    if (status) rows = rows.filter(r => r.status === status);
+    return res.json(await Promise.all(rows.map(enrichResult)));
+  }
+
+  // Staff roles: fetch all results (with optional filters)
   let rows = await db.select().from(resultsTable);
   if (studentId) rows = rows.filter(r => r.studentId === parseInt(studentId as string));
   if (courseId) rows = rows.filter(r => r.courseId === parseInt(courseId as string));

@@ -17,7 +17,7 @@ router.get("/sessions", requireAuth, async (req, res) => {
   return res.json(result);
 });
 
-router.get("/sessions/active", async (req, res) => {
+router.get("/sessions/active", requireAuth, async (req, res) => {
   const [session] = await db.select().from(academicSessionsTable).where(eq(academicSessionsTable.isActive, true)).limit(1);
   if (!session) return res.json(null);
   const semesters = await db.select().from(academicSemestersTable).where(eq(academicSemestersTable.sessionId, session.id));
