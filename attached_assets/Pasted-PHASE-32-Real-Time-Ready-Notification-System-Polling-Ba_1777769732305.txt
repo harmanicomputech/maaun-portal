@@ -1,0 +1,102 @@
+PHASE 32: Real-Time Ready Notification System (Polling-Based, WebSocket-Upgradeable)
+
+OBJECTIVE:
+Enhance the existing notification system to feel real-time using efficient polling, while structuring the backend for future WebSocket support.
+
+--------------------------------------------------
+1. BACKEND IMPROVEMENT
+--------------------------------------------------
+
+Enhance notifications table:
+
+- add is_read (boolean)
+- add created_at index
+- add type (result, payment, disciplinary, welfare, system)
+
+--------------------------------------------------
+2. API ENDPOINTS
+
+GET /api/notifications/my
+
+- returns latest notifications
+- sorted by newest
+- limit (e.g. last 20)
+
+PATCH /api/notifications/read/:id
+
+- mark single as read
+
+PATCH /api/notifications/read-all
+
+--------------------------------------------------
+3. FRONTEND POLLING
+
+Implement:
+
+- fetch notifications every 10–15 seconds
+- only request:
+  - new notifications (based on last timestamp)
+
+--------------------------------------------------
+4. UI — NOTIFICATION BELL
+
+Features:
+
+- unread count badge
+- dropdown panel:
+  - latest notifications
+  - mark as read
+- click → navigate to relevant page
+
+--------------------------------------------------
+5. NOTIFICATION TRIGGERS (HOOK INTO EXISTING SYSTEM)
+
+Fire notification on:
+
+- result approved
+- payment confirmed
+- disciplinary action
+- appeal decision
+- welfare assignment/update
+- hostel allocation
+- graduation approval
+- new announcement
+
+--------------------------------------------------
+6. PERFORMANCE
+
+- only fetch deltas (new records)
+- debounce polling when tab inactive
+
+--------------------------------------------------
+7. UX IMPROVEMENTS
+
+- subtle animation on new notification
+- sound (optional)
+- highlight new items briefly
+
+--------------------------------------------------
+8. FUTURE WEBSOCKET HOOK
+
+Structure backend so that:
+
+- notification service emits events
+- later can plug into:
+  - WebSocket server
+  - or server-sent events (SSE)
+
+--------------------------------------------------
+9. SECURITY
+
+- users can only fetch their own notifications
+- validate all access via RBAC
+
+--------------------------------------------------
+10. FINAL RULE
+
+DO NOT introduce WebSockets in this phase.
+
+System must remain:
+- lightweight
+- cPanel-compatible
+- easy to deploy
