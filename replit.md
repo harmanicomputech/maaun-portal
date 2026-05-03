@@ -21,6 +21,8 @@ Full-stack University Management Portal for Maryam Abacha American University of
 - Phase 43: Sidebar notification badges — unread count derived from NotificationContext, color-coded per type
 - Phase 44: Global Search — `GET /api/search?q=` ILIKE across 6 categories, role-gated server-side, Ctrl+K CommandDialog UI, 300ms debounce + LRU cache
 - Phase 45: Academic Calendar — `GET /api/calendar?month=YYYY-MM` aggregates timetable (weekly recurring → expanded to dates), announcements, payments, disciplinary, graduation, welfare, hostel events. Monthly grid + agenda views, 7 color-coded event types, click-to-navigate, role-filtered. Sidebar Calendar link for all 9 roles at `/calendar`.
+- Phase 46: Today's Schedule Widget — `TodaySchedule` component on all 9 role dashboards. Reuses `["calendar", monthKey]` React Query cache (zero extra API calls). Color-coded event rows, "Now" badge for ongoing events, click-to-navigate, tooltip on hover.
+- Phase 47: Academic Progress Tracker — `/student/progress` page with CGPA area trend chart, per-semester bar chart, graduation readiness radial gauge (50% units + 30% GPA quality + 20% min threshold), classification scale reference, carryover courses list. `AcademicProgressWidget` compact card on student dashboard (side-by-side with TodaySchedule). Reuses `["academic-standing-my"]` React Query cache from existing academic-standing page. Sidebar link added. No new backend endpoints.
 
 ## DB Tables
 

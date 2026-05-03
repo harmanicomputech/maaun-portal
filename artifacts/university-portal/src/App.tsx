@@ -23,6 +23,7 @@ import StudentProfile from "@/pages/student/profile";
 import StudentPayments from "@/pages/student/payments";
 import StudentNotifications from "@/pages/student/notifications";
 import StudentAcademicStanding from "@/pages/student/academic-standing";
+import StudentProgress from "@/pages/student/progress";
 import StudentReceipts from "@/pages/student/receipts";
 import StudentTimetable from "@/pages/student/timetable";
 import StudentGraduation from "@/pages/student/graduation";
@@ -101,6 +102,7 @@ function Router() {
       <Route path="/student/timetable"><AppLayout><StudentTimetable /></AppLayout></Route>
       <Route path="/student/notifications"><AppLayout><StudentNotifications /></AppLayout></Route>
       <Route path="/student/academic-standing"><AppLayout><StudentAcademicStanding /></AppLayout></Route>
+      <Route path="/student/progress"><AppLayout><StudentProgress /></AppLayout></Route>
       <Route path="/student/graduation"><AppLayout><StudentGraduation /></AppLayout></Route>
       <Route path="/student/hostel"><AppLayout><StudentHostel /></AppLayout></Route>
       <Route path="/student/disciplinary"><AppLayout><StudentDisciplinary /></AppLayout></Route>

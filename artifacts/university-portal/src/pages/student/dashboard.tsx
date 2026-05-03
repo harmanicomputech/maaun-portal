@@ -12,6 +12,7 @@ import { Link } from "wouter";
 import { StatCard, HeroCard } from "@/components/ui/stat-card";
 import { motion } from "framer-motion";
 import { TodaySchedule } from "@/components/dashboard/today-schedule";
+import { AcademicProgressWidget } from "@/components/dashboard/academic-progress-widget";
 
 const BASE = () => (import.meta.env.BASE_URL?.replace(/\/$/, "") || "");
 const authHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem("maaun_token") || ""}` });
@@ -151,7 +152,10 @@ export default function StudentDashboard() {
         />
       </div>
 
-      <TodaySchedule />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <TodaySchedule />
+        <AcademicProgressWidget />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Results */}

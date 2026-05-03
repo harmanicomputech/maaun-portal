@@ -6,7 +6,7 @@ import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
   User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
   Award, ScrollText, Receipt, Calendar, Home, ShieldAlert, Heart,
-  Crown, UserCog, Scale, Megaphone,
+  Crown, UserCog, Scale, Megaphone, TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
     { href: "/student/enrollments",       label: "My Enrollments",     icon: GraduationCap },
     { href: "/student/results",           label: "Academic Results",   icon: FileText },
     { href: "/student/academic-standing", label: "Academic Standing",  icon: Award },
+    { href: "/student/progress",          label: "Academic Progress",  icon: TrendingUp },
     { href: "/student/graduation",        label: "Graduation",         icon: GraduationCap },
     { href: "/student/hostel",            label: "Hostel",             icon: Home },
     { href: "/student/disciplinary",      label: "Disciplinary",       icon: ShieldAlert },
