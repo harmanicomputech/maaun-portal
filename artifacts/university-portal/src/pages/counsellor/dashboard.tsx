@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PageTransition, StaggerList, StaggerItem } from "@/components/ui/page-transition";
 import { HeroCard, StatCard } from "@/components/ui/stat-card";
 import { Heart, Clock, CheckCircle, AlertCircle, User } from "lucide-react";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 
 const BASE = (import.meta.env.BASE_URL || "").replace(/\/$/, "");
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem("maaun_token") || ""}` });
@@ -71,6 +72,10 @@ export default function CounsellorDashboard() {
           <StatCard label="Resolved" value={loading ? "—" : resolved} icon={CheckCircle} iconColor="text-green-600" iconBg="bg-green-50" />
         </StaggerItem>
       </StaggerList>
+
+      <div className="mt-6">
+        <TodaySchedule />
+      </div>
 
       {urgent > 0 && (
         <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PageTransition, StaggerList, StaggerItem } from "@/components/ui/page-transition";
 import { HeroCard, StatCard } from "@/components/ui/stat-card";
 import { BookOpen, Calendar, Clock, CheckCircle } from "lucide-react";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -55,6 +56,10 @@ export default function HodDashboard() {
           <StatCard label="Approved Results" value={loading ? "—" : approved}          icon={CheckCircle} iconColor="text-green-600" iconBg="bg-green-50" />
         </StaggerItem>
       </StaggerList>
+
+      <div className="mt-6">
+        <TodaySchedule />
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6 mt-6">
         <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">

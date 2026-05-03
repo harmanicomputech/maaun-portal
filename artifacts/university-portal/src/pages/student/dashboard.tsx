@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { StatCard, HeroCard } from "@/components/ui/stat-card";
 import { motion } from "framer-motion";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 
 const BASE = () => (import.meta.env.BASE_URL?.replace(/\/$/, "") || "");
 const authHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem("maaun_token") || ""}` });
@@ -149,6 +150,8 @@ export default function StudentDashboard() {
           index={2}
         />
       </div>
+
+      <TodaySchedule />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Results */}

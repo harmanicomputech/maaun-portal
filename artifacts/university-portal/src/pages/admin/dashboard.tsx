@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Users, GraduationCap, BookOpen, ClipboardList, DollarSign } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { StatCard } from "@/components/ui/stat-card";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
@@ -53,6 +54,8 @@ export default function AdminDashboard() {
           <StatCard key={s.label} {...s} index={i} />
         ))}
       </div>
+
+      <TodaySchedule />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div

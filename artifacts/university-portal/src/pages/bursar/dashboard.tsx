@@ -3,6 +3,7 @@ import { PageTransition, StaggerList, StaggerItem } from "@/components/ui/page-t
 import { HeroCard, StatCard } from "@/components/ui/stat-card";
 import { DollarSign, TrendingUp, AlertCircle, XCircle, Receipt } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 
 const BASE = (import.meta.env.BASE_URL || "").replace(/\/$/, "");
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem("maaun_token") || ""}` });
@@ -74,6 +75,10 @@ export default function BursarDashboard() {
           <StatCard label="Reversed"       value={loading ? "—" : analytics?.reversedCount ?? 0}  icon={XCircle}      iconColor="text-red-600"    iconBg="bg-red-50" />
         </StaggerItem>
       </StaggerList>
+
+      <div className="mt-6">
+        <TodaySchedule />
+      </div>
 
       {monthData.length > 0 && (
         <div className="mt-6 bg-card rounded-2xl border shadow-sm p-6">

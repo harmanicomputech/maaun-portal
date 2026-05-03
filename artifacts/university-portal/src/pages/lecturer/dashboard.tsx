@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen, Users, ClipboardList, GraduationCap } from "lucide-react";
 import { StatCard, HeroCard } from "@/components/ui/stat-card";
 import { motion } from "framer-motion";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 
 export default function LecturerDashboard() {
   const { data: dashboard, isLoading } = useGetLecturerDashboard();
@@ -71,6 +72,8 @@ export default function LecturerDashboard() {
           index={2}
         />
       </div>
+
+      <TodaySchedule />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* My Courses */}

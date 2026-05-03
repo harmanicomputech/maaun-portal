@@ -1,0 +1,101 @@
+PHASE 46: Dashboard Time-Aware Context Layer (Today's Schedule Engine)
+
+OBJECTIVE:
+Build a lightweight "Today's Schedule" widget that sits on each role dashboard and reuses the existing Unified Academic Calendar engine as its ONLY data source.
+
+DO NOT create new APIs.
+DO NOT duplicate event logic.
+ONLY filter and project existing calendar data.
+
+--------------------------------------------------
+1. DATA SOURCE (CRITICAL RULE)
+--------------------------------------------------
+
+All data MUST come from:
+
+GET /api/calendar?month=YYYY-MM
+
+NO additional endpoints allowed.
+
+--------------------------------------------------
+2. TODAY FILTER ENGINE
+--------------------------------------------------
+
+From the monthly event dataset:
+
+Filter:
+- events where date === today (user timezone)
+- include ongoing events (start <= now <= end)
+
+Return:
+
+todayEvents[]
+
+--------------------------------------------------
+3. ROLE-AWARE FILTERING
+--------------------------------------------------
+
+Reuse existing calendar role filtering:
+
+student → classes, exams, payments, announcements
+lecturer → classes, announcements
+counsellor → welfare, disciplinary
+bursar → payments
+registrar → graduation, transcripts
+hod → timetable + academic events
+dean → academic overview
+admin → all
+super_admin → all
+
+--------------------------------------------------
+4. WIDGET UI (DASHBOARD CARD)
+--------------------------------------------------
+
+Add to ALL role dashboards:
+
+"Today's Schedule" card
+
+Features:
+- compact vertical timeline
+- time on left, event title on right
+- color-coded event types
+- max 5 visible events + "View all in Calendar" link
+
+Empty state:
+- "No events scheduled for today"
+
+--------------------------------------------------
+5. INTERACTION BEHAVIOR
+--------------------------------------------------
+
+- clicking event → navigates to module route
+- hover shows tooltip (desktop only)
+- mobile shows stacked cards
+
+--------------------------------------------------
+6. PERFORMANCE RULES
+--------------------------------------------------
+
+- reuse calendar React Query cache
+- no extra network calls
+- memoize filtered results
+- update only on:
+  - date change
+  - calendar refetch
+
+--------------------------------------------------
+7. CONSISTENCY RULES
+--------------------------------------------------
+
+- must always match /calendar data exactly
+- no divergence between widget and full calendar
+- timezone consistency enforced globally
+
+--------------------------------------------------
+END RESULT:
+
+A real-time dashboard context layer that:
+- keeps users informed without leaving dashboard
+- reuses unified calendar engine
+- improves daily usability
+- reduces navigation friction

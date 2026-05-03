@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PageTransition, StaggerList, StaggerItem } from "@/components/ui/page-transition";
 import { HeroCard, StatCard } from "@/components/ui/stat-card";
 import { Crown, GraduationCap, Clock, CheckCircle } from "lucide-react";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -54,6 +55,10 @@ export default function DeanDashboard() {
           <StatCard label="Cleared Students"  value={loading ? "—" : approvedGrad}   icon={Crown}        iconColor="text-primary"    iconBg="bg-primary/10" />
         </StaggerItem>
       </StaggerList>
+
+      <div className="mt-6">
+        <TodaySchedule />
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6 mt-6">
         <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
