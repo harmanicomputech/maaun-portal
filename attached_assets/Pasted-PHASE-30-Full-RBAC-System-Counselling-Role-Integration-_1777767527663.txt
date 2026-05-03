@@ -1,0 +1,257 @@
+PHASE 30: Full RBAC System + Counselling Role Integration + Final Feature Completion
+
+OBJECTIVE:
+Implement a scalable Role-Based Access Control (RBAC) system, fully integrate the counselling/welfare module into the permission structure, and formally conclude all feature development for a production-ready university operating system.
+
+--------------------------------------------------
+1. CORE RBAC DATABASE DESIGN
+--------------------------------------------------
+
+Create tables:
+
+roles
+- id
+- name (student, lecturer, counsellor, bursar, registrar, hod, dean, admin, super_admin)
+- description
+
+permissions
+- id
+- name
+- description
+
+role_permissions
+- role_id
+- permission_id
+
+user_roles
+- user_id
+- role_id
+
+--------------------------------------------------
+2. INITIAL ROLE SETUP (SEEDER)
+
+Seed roles:
+
+- student
+- lecturer
+- counsellor
+- bursar
+- registrar
+- hod
+- dean
+- admin
+- super_admin
+
+--------------------------------------------------
+3. PERMISSION STRUCTURE (EXPANDED)
+
+ACADEMIC:
+- view_courses
+- manage_courses
+- enter_results
+- approve_results
+
+FINANCE:
+- view_payments
+- confirm_payments
+- reverse_payments
+- view_financial_reports
+
+DISCIPLINARY:
+- manage_disciplinary_cases
+- apply_sanctions
+- review_appeals
+
+WELFARE / COUNSELLING:
+- create_welfare_case
+- view_own_welfare_cases
+- view_assigned_welfare_cases
+- manage_welfare_cases
+- assign_welfare_cases
+- add_private_notes
+- add_shared_notes
+- close_welfare_cases
+
+HOSTEL:
+- manage_hostels
+- allocate_rooms
+
+GRADUATION:
+- evaluate_clearance
+- approve_graduation
+
+SYSTEM:
+- manage_users
+- assign_roles
+- view_audit_logs
+
+SUPER:
+- full_access
+
+--------------------------------------------------
+4. ROLE → PERMISSION MAPPING (IMPORTANT)
+
+Student:
+- create_welfare_case
+- view_own_welfare_cases
+- view_courses
+
+Counsellor:
+- view_assigned_welfare_cases
+- manage_welfare_cases
+- add_private_notes
+- add_shared_notes
+- close_welfare_cases
+
+Admin:
+- assign_welfare_cases
+- manage_welfare_cases
+- view_audit_logs
+- manage_users
+
+Bursar:
+- finance permissions only
+
+Registrar:
+- approve_results
+- approve_graduation
+
+Super Admin:
+- full_access (all permissions automatically granted)
+
+--------------------------------------------------
+5. COUNSELLING SYSTEM COMPLETION (CRITICAL)
+
+Enhance existing welfare module:
+
+- Enforce permission-based access (no role-only checks)
+- Counsellors ONLY access assigned cases via permission checks
+- Admin assigns counsellors via assign_welfare_cases permission
+- Students only see non-private notes (enforced via permission layer)
+
+--------------------------------------------------
+6. CONFIDENTIALITY ENFORCEMENT (FINAL)
+
+- Sensitive categories (mental_health, harassment):
+  - require manage_welfare_cases permission
+  - always display CONFIDENTIAL badge
+
+- Private notes:
+  - accessible only with add_private_notes permission
+
+- Logs:
+  - never store raw sensitive descriptions
+  - store masked values
+
+--------------------------------------------------
+7. AUTHORIZATION ENGINE
+
+Implement:
+
+user.hasRole(role_name)
+user.hasPermission(permission_name)
+
+Middleware:
+- RequirePermission(permission_name)
+
+All endpoints MUST use permission checks.
+
+--------------------------------------------------
+8. SYSTEM-WIDE MIGRATION (MANDATORY)
+
+Replace ALL logic:
+
+FROM:
+if (user.role === 'counsellor')
+
+TO:
+if (user.hasPermission('view_assigned_welfare_cases'))
+
+Apply across ALL modules:
+- welfare
+- finance
+- disciplinary
+- hostel
+- graduation
+
+--------------------------------------------------
+9. ROLE MANAGEMENT PANEL (FINAL VERSION)
+
+Page: /admin/users
+
+Features:
+- assign MULTIPLE roles
+- remove roles
+- role badges display
+- role history (optional)
+
+Security:
+- only super_admin can assign admin/super_admin
+
+--------------------------------------------------
+10. SUPER ADMIN RULES
+
+- bypass all permission checks
+- full system override
+- cannot be restricted
+- only super_admin can create another super_admin
+
+--------------------------------------------------
+11. AUDIT LOGGING
+
+Log:
+- role assignments
+- permission changes
+- welfare case assignments
+- sensitive actions (without exposing content)
+
+--------------------------------------------------
+12. PERFORMANCE OPTIMIZATION
+
+- cache permissions per user
+- reduce repeated DB queries
+
+--------------------------------------------------
+13. FINAL VALIDATION TESTS
+
+Verify:
+
+- student cannot view other welfare cases
+- counsellor cannot access unassigned cases
+- bursar cannot access welfare module
+- admin can assign counsellors
+- super_admin can access everything
+
+--------------------------------------------------
+14. FEATURE COMPLETION LOCK (VERY IMPORTANT)
+
+After implementation:
+
+- Mark system as FEATURE COMPLETE
+- Disable new feature flags
+- Only allow:
+  - bug fixes
+  - performance improvements
+  - UI polish
+  - security hardening
+
+--------------------------------------------------
+15. SYSTEM STATUS FLAG
+
+Set:
+
+SYSTEM_PHASE = "PRODUCTION_READY"
+
+--------------------------------------------------
+16. FINAL DOCUMENTATION
+
+Generate:
+
+- Role list and descriptions
+- Permission matrix table
+- Counsellor workflow guide
+- Admin role management guide
+
+--------------------------------------------------
+END OF ALL FEATURE DEVELOPMENT
+SYSTEM IS NOW A COMPLETE UNIVERSITY OPERATING PLATFORM

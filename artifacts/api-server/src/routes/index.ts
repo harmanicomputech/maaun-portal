@@ -20,6 +20,7 @@ import hostelRouter from "./hostel";
 import disciplinaryRouter from "./disciplinary";
 import appealsRouter from "./appeals";
 import welfareRouter from "./welfare";
+import userManagementRouter from "./user-management";
 
 const router: IRouter = Router();
 
@@ -44,5 +45,6 @@ router.use(hostelRouter);
 router.use(disciplinaryRouter);
 router.use(appealsRouter);
 router.use(welfareRouter);
+router.use(userManagementRouter);
 
 export default router;

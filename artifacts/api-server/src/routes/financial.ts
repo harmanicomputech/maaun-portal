@@ -141,7 +141,7 @@ router.get("/ledger/my", requireAuth, async (req, res) => {
 });
 
 // ─── Admin: get all receipts ──────────────────────────────────────────────────
-router.get("/receipts", requireAuth, requireRole("admin"), async (req, res) => {
+router.get("/receipts", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const rows = await db
     .select({
       id: receiptsTable.id,
@@ -168,7 +168,7 @@ router.get("/receipts", requireAuth, requireRole("admin"), async (req, res) => {
 });
 
 // ─── Admin: confirm receipt ───────────────────────────────────────────────────
-router.patch("/receipts/:id/confirm", requireAuth, requireRole("admin"), async (req, res) => {
+router.patch("/receipts/:id/confirm", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
 
@@ -195,7 +195,7 @@ router.patch("/receipts/:id/confirm", requireAuth, requireRole("admin"), async (
 });
 
 // ─── Admin: reverse receipt ───────────────────────────────────────────────────
-router.patch("/receipts/:id/reverse", requireAuth, requireRole("admin"), async (req, res) => {
+router.patch("/receipts/:id/reverse", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
 
@@ -238,7 +238,7 @@ router.patch("/receipts/:id/reverse", requireAuth, requireRole("admin"), async (
 });
 
 // ─── Admin: finance analytics ─────────────────────────────────────────────────
-router.get("/finance/analytics", requireAuth, requireRole("admin"), async (req, res) => {
+router.get("/finance/analytics", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const receipts = await db
     .select({
       id: receiptsTable.id,
@@ -291,7 +291,7 @@ router.get("/finance/analytics", requireAuth, requireRole("admin"), async (req, 
 });
 
 // ─── Admin: student ledger view ───────────────────────────────────────────────
-router.get("/ledger/student/:userId", requireAuth, requireRole("admin"), async (req, res) => {
+router.get("/ledger/student/:userId", requireAuth, requireRole("admin", "bursar"), async (req, res) => {
   const uid = parseInt(req.params.userId);
   if (isNaN(uid)) return res.status(400).json({ error: "Invalid userId" });
 

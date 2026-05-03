@@ -4,10 +4,11 @@ import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
   User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
   Award, ScrollText, Receipt, Calendar, Home, ShieldAlert, Heart,
+  Crown, UserCog, Scale,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const ROLE_LINKS = {
+const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> = {
   student: [
     { href: "/student/dashboard",         label: "Dashboard",          icon: LayoutDashboard },
     { href: "/student/timetable",         label: "My Timetable",       icon: Calendar },
@@ -25,15 +26,33 @@ const ROLE_LINKS = {
     { href: "/student/profile",           label: "My Profile",         icon: UserIcon },
   ],
   counsellor: [
-    { href: "/counsellor/welfare", label: "My Assigned Cases", icon: Heart },
+    { href: "/counsellor/welfare",        label: "My Assigned Cases",  icon: Heart },
+  ],
+  bursar: [
+    { href: "/bursar/finance",            label: "Finance & Receipts", icon: Receipt },
+    { href: "/bursar/payments",           label: "Payments & Fees",    icon: DollarSign },
+  ],
+  registrar: [
+    { href: "/registrar/results",         label: "All Results",        icon: FileText },
+    { href: "/registrar/graduation",      label: "Graduation",         icon: GraduationCap },
+    { href: "/registrar/transcripts",     label: "Transcripts",        icon: ScrollText },
+  ],
+  hod: [
+    { href: "/hod/courses",              label: "Manage Courses",     icon: BookOpen },
+    { href: "/hod/timetable",            label: "Timetable",          icon: Calendar },
+    { href: "/hod/results",              label: "All Results",        icon: FileText },
+  ],
+  dean: [
+    { href: "/dean/results",             label: "All Results",        icon: FileText },
+    { href: "/dean/graduation",          label: "Graduation",         icon: GraduationCap },
   ],
   lecturer: [
-    { href: "/lecturer/dashboard",  label: "Dashboard",           icon: LayoutDashboard },
-    { href: "/lecturer/timetable",  label: "Teaching Schedule",   icon: Calendar },
-    { href: "/lecturer/courses",    label: "My Courses",          icon: BookOpen },
-    { href: "/lecturer/students",   label: "Students",            icon: Users },
-    { href: "/lecturer/results",    label: "Manage Results",      icon: FileText },
-    { href: "/lecturer/transcript", label: "Transcript Requests", icon: ScrollText },
+    { href: "/lecturer/dashboard",        label: "Dashboard",          icon: LayoutDashboard },
+    { href: "/lecturer/timetable",        label: "Teaching Schedule",  icon: Calendar },
+    { href: "/lecturer/courses",          label: "My Courses",         icon: BookOpen },
+    { href: "/lecturer/students",         label: "Students",           icon: Users },
+    { href: "/lecturer/results",          label: "Manage Results",     icon: FileText },
+    { href: "/lecturer/transcript",       label: "Transcript Requests",icon: ScrollText },
   ],
   admin: [
     { href: "/admin/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
@@ -53,7 +72,40 @@ const ROLE_LINKS = {
     { href: "/admin/sessions",           label: "Academic Sessions",  icon: CalendarDays },
     { href: "/admin/notifications",      label: "Notifications",      icon: Bell },
     { href: "/admin/activity-logs",      label: "Audit Log",          icon: Activity },
+    { href: "/admin/user-management",    label: "User & Roles",       icon: UserCog },
   ],
+  super_admin: [
+    { href: "/admin/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
+    { href: "/admin/timetable",          label: "Timetable",          icon: Calendar },
+    { href: "/admin/graduation",         label: "Graduation",         icon: GraduationCap },
+    { href: "/admin/hostel",             label: "Hostel",             icon: Home },
+    { href: "/admin/disciplinary",       label: "Disciplinary",       icon: ShieldAlert },
+    { href: "/admin/welfare",            label: "Student Welfare",    icon: Heart },
+    { href: "/admin/courses",            label: "Manage Courses",     icon: BookOpen },
+    { href: "/admin/students",           label: "Students",           icon: Users },
+    { href: "/admin/lecturers",          label: "Lecturers",          icon: GraduationCap },
+    { href: "/admin/results",            label: "All Results",        icon: FileText },
+    { href: "/admin/academic-standing",  label: "Academic Standings", icon: Award },
+    { href: "/admin/transcripts",        label: "Transcripts",        icon: ScrollText },
+    { href: "/admin/finance",            label: "Finance & Receipts", icon: Receipt },
+    { href: "/admin/payments",           label: "Payments & Fees",    icon: DollarSign },
+    { href: "/admin/sessions",           label: "Academic Sessions",  icon: CalendarDays },
+    { href: "/admin/notifications",      label: "Notifications",      icon: Bell },
+    { href: "/admin/activity-logs",      label: "Audit Log",          icon: Activity },
+    { href: "/admin/user-management",    label: "User & Roles",       icon: UserCog },
+  ],
+};
+
+const ROLE_DISPLAY: Record<string, { label: string; color: string }> = {
+  student:     { label: "Student",     color: "text-primary-foreground/70" },
+  lecturer:    { label: "Lecturer",    color: "text-primary-foreground/70" },
+  counsellor:  { label: "Counsellor",  color: "text-purple-300" },
+  bursar:      { label: "Bursar",      color: "text-green-300" },
+  registrar:   { label: "Registrar",   color: "text-blue-300" },
+  hod:         { label: "Head of Dept",color: "text-indigo-300" },
+  dean:        { label: "Dean",        color: "text-violet-300" },
+  admin:       { label: "Admin",       color: "text-orange-300" },
+  super_admin: { label: "Super Admin", color: "text-red-300" },
 };
 
 export function Sidebar() {
@@ -63,6 +115,8 @@ export function Sidebar() {
   if (!user) return null;
 
   const links = ROLE_LINKS[user.role as keyof typeof ROLE_LINKS] || [];
+  const roleDisplay = ROLE_DISPLAY[user.role] ?? { label: user.role, color: "text-primary-foreground/70" };
+  const isSuperAdmin = user.role === "super_admin";
 
   return (
     <div className="w-64 bg-primary text-primary-foreground h-full flex flex-col hidden md:flex shrink-0">
@@ -75,8 +129,14 @@ export function Sidebar() {
 
       <div className="px-4 pb-3">
         <div className="bg-primary-foreground/10 rounded-lg p-3">
-          <p className="text-sm font-medium truncate">{user.name}</p>
-          <p className="text-xs text-primary-foreground/70 capitalize mt-0.5">{user.role}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-medium truncate flex-1">{user.name}</p>
+            {isSuperAdmin && <Crown className="w-3.5 h-3.5 text-red-300 shrink-0" />}
+          </div>
+          <p className={`text-xs mt-0.5 flex items-center gap-1 ${roleDisplay.color}`}>
+            {isSuperAdmin && <Scale className="w-2.5 h-2.5" />}
+            {roleDisplay.label}
+          </p>
         </div>
       </div>
 

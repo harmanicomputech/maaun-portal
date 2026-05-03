@@ -50,6 +50,7 @@ import AdminGraduation from "@/pages/admin/graduation";
 import AdminHostel from "@/pages/admin/hostel";
 import AdminDisciplinary from "@/pages/admin/disciplinary";
 import AdminWelfare from "@/pages/admin/welfare";
+import AdminUserManagement from "@/pages/admin/user-management";
 import CounsellorWelfare from "@/pages/counsellor/welfare";
 
 const queryClient = new QueryClient({
@@ -111,8 +112,28 @@ function Router() {
       <Route path="/admin/disciplinary"><AppLayout><AdminDisciplinary /></AppLayout></Route>
       <Route path="/admin/welfare"><AppLayout><AdminWelfare /></AppLayout></Route>
 
+      <Route path="/admin/user-management"><AppLayout><AdminUserManagement /></AppLayout></Route>
+
       {/* Counsellor Routes */}
       <Route path="/counsellor/welfare"><AppLayout><CounsellorWelfare /></AppLayout></Route>
+
+      {/* Bursar — finance pages shared with admin */}
+      <Route path="/bursar/finance"><AppLayout><AdminFinance /></AppLayout></Route>
+      <Route path="/bursar/payments"><AppLayout><AdminPayments /></AppLayout></Route>
+
+      {/* Registrar — results & graduation shared with admin */}
+      <Route path="/registrar/results"><AppLayout><AdminResults /></AppLayout></Route>
+      <Route path="/registrar/graduation"><AppLayout><AdminGraduation /></AppLayout></Route>
+      <Route path="/registrar/transcripts"><AppLayout><AdminTranscripts /></AppLayout></Route>
+
+      {/* HoD — courses + results */}
+      <Route path="/hod/courses"><AppLayout><AdminCourses /></AppLayout></Route>
+      <Route path="/hod/timetable"><AppLayout><AdminTimetable /></AppLayout></Route>
+      <Route path="/hod/results"><AppLayout><AdminResults /></AppLayout></Route>
+
+      {/* Dean — graduation + results */}
+      <Route path="/dean/results"><AppLayout><AdminResults /></AppLayout></Route>
+      <Route path="/dean/graduation"><AppLayout><AdminGraduation /></AppLayout></Route>
 
       <Route path="/">
         <AppLayout>

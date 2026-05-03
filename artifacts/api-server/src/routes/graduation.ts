@@ -203,7 +203,7 @@ router.post("/graduation/apply", requireAuth, requireRole("student"), async (req
 });
 
 // ─── Admin: list all graduation data ─────────────────────────────────────────
-router.get("/graduation/admin/list", requireAuth, requireRole("admin"), async (req, res) => {
+router.get("/graduation/admin/list", requireAuth, requireRole("admin", "registrar", "dean"), async (req, res) => {
   const students = await db
     .select({
       studentId: studentsTable.id,
@@ -237,7 +237,7 @@ router.get("/graduation/admin/list", requireAuth, requireRole("admin"), async (r
 });
 
 // ─── Admin: evaluate specific student ────────────────────────────────────────
-router.post("/graduation/admin/evaluate/:studentId", requireAuth, requireRole("admin"), async (req, res) => {
+router.post("/graduation/admin/evaluate/:studentId", requireAuth, requireRole("admin", "registrar", "dean"), async (req, res) => {
   const studentId = parseInt(req.params.studentId);
   if (isNaN(studentId)) return res.status(400).json({ error: "Invalid studentId" });
 
@@ -261,7 +261,7 @@ router.post("/graduation/admin/evaluate/:studentId", requireAuth, requireRole("a
 });
 
 // ─── Admin: approve application ───────────────────────────────────────────────
-router.patch("/graduation/applications/:id/approve", requireAuth, requireRole("admin"), async (req, res) => {
+router.patch("/graduation/applications/:id/approve", requireAuth, requireRole("admin", "registrar", "dean"), async (req, res) => {
   const id = parseInt(req.params.id);
   const [app] = await db.select().from(graduationApplicationsTable).where(eq(graduationApplicationsTable.id, id)).limit(1);
   if (!app) return res.status(404).json({ error: "Application not found" });
@@ -288,7 +288,7 @@ router.patch("/graduation/applications/:id/approve", requireAuth, requireRole("a
 });
 
 // ─── Admin: reject application ────────────────────────────────────────────────
-router.patch("/graduation/applications/:id/reject", requireAuth, requireRole("admin"), async (req, res) => {
+router.patch("/graduation/applications/:id/reject", requireAuth, requireRole("admin", "registrar", "dean"), async (req, res) => {
   const id = parseInt(req.params.id);
   const { reason } = req.body;
   if (!reason) return res.status(400).json({ error: "Rejection reason is required" });
@@ -318,7 +318,7 @@ router.patch("/graduation/applications/:id/reject", requireAuth, requireRole("ad
 });
 
 // ─── Admin: override eligibility ──────────────────────────────────────────────
-router.post("/graduation/admin/override/:studentId", requireAuth, requireRole("admin"), async (req, res) => {
+router.post("/graduation/admin/override/:studentId", requireAuth, requireRole("admin", "registrar", "dean"), async (req, res) => {
   const studentId = parseInt(req.params.studentId);
   const { reason } = req.body;
   if (!reason) return res.status(400).json({ error: "Override reason is required" });
