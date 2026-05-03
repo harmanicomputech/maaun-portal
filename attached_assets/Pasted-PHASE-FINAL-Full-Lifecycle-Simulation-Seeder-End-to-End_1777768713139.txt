@@ -1,0 +1,271 @@
+PHASE FINAL: Full Lifecycle Simulation Seeder (End-to-End Test Data)
+
+OBJECTIVE:
+Generate realistic, interlinked dummy data that exercises every system feature from admission to graduation, including edge cases.
+
+--------------------------------------------------
+1. USERS (MULTI-ROLE SETUP)
+--------------------------------------------------
+
+Create:
+
+Students:
+- 20 students across different departments and levels (100–400)
+
+Staff:
+- 2 lecturers per department
+- 1 HOD per department
+- 1 dean
+- 1 registrar
+- 1 bursar
+- 2 counsellors
+- 2 admins
+- 1 super_admin
+
+--------------------------------------------------
+2. ACADEMIC STRUCTURE
+--------------------------------------------------
+
+Create:
+
+- 3 departments (e.g. Computer Science, Business Admin, Mass Comm)
+- 20–30 courses distributed by level and semester
+- Assign lecturers to courses
+
+--------------------------------------------------
+3. COURSE REGISTRATION
+--------------------------------------------------
+
+For each student:
+
+- Register 5–8 courses for current semester
+- Include:
+  - valid registrations
+  - duplicate attempt (should fail)
+  - dropped course scenario
+
+--------------------------------------------------
+4. RESULTS & CGPA
+--------------------------------------------------
+
+Generate:
+
+- Results for 2–4 semesters per student
+- Include:
+  - A–F grades
+  - carryover courses (F)
+  - resit passes
+
+Ensure:
+
+- Some students:
+  - First Class
+  - Second Class Upper/Lower
+  - Probation
+  - Withdrawal risk
+
+--------------------------------------------------
+5. FINANCE SYSTEM
+--------------------------------------------------
+
+For students:
+
+- Generate:
+  - full payment (cleared)
+  - partial payment
+  - unpaid student
+
+- Trigger:
+  - Paystack-like successful payments
+  - receipt generation
+  - ledger entries
+
+- Include:
+  - one reversed payment
+
+--------------------------------------------------
+6. TIMETABLE
+--------------------------------------------------
+
+Create:
+
+- Weekly schedule (Mon–Fri)
+- Assign:
+  - course
+  - lecturer
+  - venue
+
+Include:
+- one conflict attempt (should fail validation)
+
+--------------------------------------------------
+7. HOSTEL SYSTEM
+--------------------------------------------------
+
+Create:
+
+- 2 hostels (male/female)
+- rooms + bed spaces
+
+Simulate:
+
+- applications:
+  - eligible students
+  - ineligible (probation / unpaid)
+
+- allocations:
+  - successful
+  - rejected
+
+--------------------------------------------------
+8. DISCIPLINARY SYSTEM
+--------------------------------------------------
+
+Create:
+
+- 5 cases:
+  - minor (warning)
+  - major (suspension)
+  - critical (expulsion)
+
+Apply:
+
+- sanctions
+- system flags
+
+--------------------------------------------------
+9. APPEALS SYSTEM
+--------------------------------------------------
+
+For some cases:
+
+- submit appeals
+- process:
+  - upheld
+  - modified
+  - dismissed
+
+Verify:
+- flags update correctly
+
+--------------------------------------------------
+10. WELFARE SYSTEM
+--------------------------------------------------
+
+Create:
+
+- 6 cases:
+  - mental health (confidential)
+  - financial distress
+  - harassment
+
+Assign:
+
+- counsellors
+- notes:
+  - private
+  - shared
+
+--------------------------------------------------
+11. GRADUATION SYSTEM
+--------------------------------------------------
+
+Simulate:
+
+Eligible students:
+- CGPA ≥ threshold
+- no carryovers
+- fees cleared
+- transcript exists
+
+Ineligible:
+- failed course
+- unpaid fees
+- disciplinary block
+
+Process:
+
+- application
+- approval
+- rejection
+- override case
+
+--------------------------------------------------
+12. TRANSCRIPTS
+--------------------------------------------------
+
+Generate:
+
+- draft → approved → official
+
+Include:
+- QR verification reference
+
+--------------------------------------------------
+13. ANNOUNCEMENTS
+--------------------------------------------------
+
+Create:
+
+- 3 pinned
+- 5 regular
+
+Target:
+- students only
+- staff only
+- mixed roles
+
+--------------------------------------------------
+14. EDGE CASES (VERY IMPORTANT)
+
+Include:
+
+- student with:
+  - unpaid fees + trying graduation
+  - disciplinary block + hostel attempt
+  - appeal modifying sanction
+  - counsellor accessing unassigned case (should fail)
+
+--------------------------------------------------
+15. AUTOMATION
+
+Create command:
+
+- runFullSimulationSeed()
+
+Runs everything in correct order:
+1. users
+2. roles
+3. academic data
+4. enrollments
+5. results
+6. finance
+7. timetable
+8. hostel
+9. disciplinary
+10. appeals
+11. welfare
+12. graduation
+13. announcements
+
+--------------------------------------------------
+16. OUTPUT LOGGING
+
+Console output:
+
+✔ Students created
+✔ Courses assigned
+✔ Results generated
+✔ Payments processed
+✔ Hostel allocated
+✔ Graduation evaluated
+✔ System ready
+
+--------------------------------------------------
+FINAL RESULT
+
+System should:
+
+- look fully populated
+- behave like a real university
+- allow testing of ALL features end-to-end
