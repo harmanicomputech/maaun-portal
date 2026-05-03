@@ -2,7 +2,7 @@
 
 ## Overview
 
-Full-stack University Management Portal for Maryam Abacha American University of Nigeria (MAAUN). React + Vite frontend, Express backend, PostgreSQL + Drizzle ORM. Three roles: student, lecturer, admin.
+Full-stack University Management Portal for Maryam Abacha American University of Nigeria (MAAUN). React + Vite frontend, Express backend, PostgreSQL + Drizzle ORM. Nine roles: student, lecturer, counsellor, bursar, registrar, hod, dean, admin, super_admin.
 
 **Design**: Primary color `#0B3CFE`, Poppins font.
 
@@ -10,6 +10,27 @@ Full-stack University Management Portal for Maryam Abacha American University of
 - Admin: `admin@maaun.edu.ng`
 - Student: `aisha.mohammed@student.maaun.edu.ng`
 - Lecturer: `ibrahim.musa@maaun.edu.ng`
+
+## Completed Feature Phases
+
+- Phase 1–26: Core academic, finance, hostel, disciplinary, welfare systems
+- Phase 27: Appeals System (disciplinary_appeals, appeal_decisions tables)
+- Phase 28: Welfare System (welfare_cases, welfare_assignments, welfare_notes + counsellor role)
+- Phase 30: RBAC — 9 roles, ROLE_PERMISSIONS map, requirePermission middleware, User Management page
+- Phase 31: Announcement & Broadcast System (announcements table, targeting engine, admin management, student dashboard integration)
+
+## DB Tables
+
+users, students, lecturers, courses, enrollments, timetable, results, academic_standing, transcripts, payments, receipts, sessions, notifications, activity_logs, hostel_rooms, hostel_allocations, disciplinary_cases, sanctions, disciplinary_appeals, appeal_decisions, welfare_cases, welfare_assignments, welfare_notes, announcements
+
+## Key Business Rules
+
+- Expired announcements (expiresAt < now) auto-hidden from users
+- Max 3 pinned announcements enforced server-side
+- Announcement targeting: role ∩ optional(department) ∩ optional(level)
+- super_admin bypasses ALL requireRole / requirePermission checks
+- Users cannot change their own role; regular admin cannot assign admin/super_admin roles
+- requireRole auto-passes super_admin regardless of role list
 
 ## Stack
 

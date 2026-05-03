@@ -1,11 +1,25 @@
 import { useGetStudentDashboard } from "@workspace/api-client-react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, GraduationCap, Trophy, AlertCircle } from "lucide-react";
+import { BookOpen, GraduationCap, Trophy, AlertCircle, Pin, Megaphone, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
+
+const BASE = () => (import.meta.env.BASE_URL?.replace(/\/$/, "") || "");
+const authHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem("maaun_token") || ""}` });
 
 export default function StudentDashboard() {
   const { data: dashboard, isLoading } = useGetStudentDashboard();
+
+  const { data: pinnedAnnouncements = [] } = useQuery<any[]>({
+    queryKey: ["pinned-announcements"],
+    queryFn: async () => {
+      const { data } = await axios.get(`${BASE()}/api/announcements?pinned=true`, { headers: authHeaders() });
+      return data;
+    },
+  });
 
   if (isLoading) {
     return (
@@ -46,6 +60,37 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Pinned Announcements */}
+      {pinnedAnnouncements.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Pin className="w-4 h-4 text-amber-600" />
+              <h2 className="text-sm font-bold text-amber-800 uppercase tracking-wider">Pinned Announcements</h2>
+            </div>
+            <Link href="/announcements">
+              <span className="text-xs text-primary hover:underline cursor-pointer">View all</span>
+            </Link>
+          </div>
+          {pinnedAnnouncements.map((ann: any) => (
+            <div key={ann.id} className="flex items-start gap-3 p-3 rounded-xl border border-amber-300 bg-amber-50/60 shadow-sm">
+              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                <Megaphone className="w-4 h-4 text-amber-700" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-900">{ann.title}</p>
+                <p className="text-xs text-amber-800/80 mt-0.5 line-clamp-2">{ann.content}</p>
+                <p className="text-[10px] text-amber-700/60 mt-1 flex items-center gap-1">
+                  <Clock className="w-2.5 h-2.5" />
+                  {new Date(ann.createdAt).toLocaleDateString("en-NG", { day: "2-digit", month: "short", year: "numeric" })}
+                  {ann.expiresAt && ` · Expires ${new Date(ann.expiresAt).toLocaleDateString("en-NG")}`}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Welcome Card */}
       <Card className="bg-primary text-primary-foreground overflow-hidden relative border-0 shadow-lg">
         <div className="absolute right-0 top-0 opacity-10 pointer-events-none">

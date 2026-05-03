@@ -1,0 +1,114 @@
+PHASE 31: Announcement & Broadcast System (Lightweight Communication Layer)
+
+OBJECTIVE:
+Add a simple but powerful announcement system for admins to broadcast messages to targeted audiences without introducing heavy new architecture.
+
+NOTE:
+This is the FINAL optional feature. Do not expand beyond this.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: announcements
+
+- id
+- title
+- content (rich text)
+- created_by (admin_id)
+- target_roles (JSON array: student, lecturer, etc.)
+- target_departments (nullable JSON)
+- target_levels (nullable JSON)
+- is_pinned (boolean)
+- expires_at (nullable)
+- created_at
+
+--------------------------------------------------
+2. TARGETING ENGINE
+
+Rules:
+
+- Show announcement if:
+  - user's role ∈ target_roles
+  - AND (department matches OR null)
+  - AND (level matches OR null)
+
+--------------------------------------------------
+3. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/announcements
+
+- Create announcement
+- Rich text editor (basic)
+- Target selection:
+  - roles (multi-select)
+  - departments (optional)
+  - levels (optional)
+
+- Toggle:
+  - pin to dashboard
+  - expiration date
+
+--------------------------------------------------
+4. STUDENT / USER FEATURES
+--------------------------------------------------
+
+Dashboard integration:
+
+- Pinned announcements appear at top
+- Regular announcements appear in list
+
+Page: /announcements
+
+- Full list
+- Sorted by:
+  - pinned first
+  - newest next
+
+--------------------------------------------------
+5. NOTIFICATIONS
+
+- Optional:
+  trigger notification when announcement is created
+
+--------------------------------------------------
+6. PERMISSIONS
+
+Use RBAC:
+
+- create_announcement
+- view_announcements
+
+Admin & super_admin:
+- full access
+
+Others:
+- read-only
+
+--------------------------------------------------
+7. UI REQUIREMENTS
+
+- Clean card layout
+- Pinned = highlighted
+- Expired = hidden automatically
+
+--------------------------------------------------
+8. BUSINESS RULES
+
+- Expired announcements should not display
+- Max 3 pinned at a time (optional constraint)
+
+--------------------------------------------------
+9. PERFORMANCE
+
+- cache announcements per role (optional)
+
+--------------------------------------------------
+10. FINAL SYSTEM RULE
+
+This marks the FINAL feature addition.
+
+After this:
+- NO new modules
+- Only optimization, scaling, and deployment work allowed

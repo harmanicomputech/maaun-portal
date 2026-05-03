@@ -4,13 +4,14 @@ import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
   User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
   Award, ScrollText, Receipt, Calendar, Home, ShieldAlert, Heart,
-  Crown, UserCog, Scale,
+  Crown, UserCog, Scale, Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> = {
   student: [
     { href: "/student/dashboard",         label: "Dashboard",          icon: LayoutDashboard },
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/student/timetable",         label: "My Timetable",       icon: Calendar },
     { href: "/student/courses",           label: "Browse Courses",     icon: BookOpen },
     { href: "/student/enrollments",       label: "My Enrollments",     icon: GraduationCap },
@@ -26,28 +27,34 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
     { href: "/student/profile",           label: "My Profile",         icon: UserIcon },
   ],
   counsellor: [
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/counsellor/welfare",        label: "My Assigned Cases",  icon: Heart },
   ],
   bursar: [
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/bursar/finance",            label: "Finance & Receipts", icon: Receipt },
     { href: "/bursar/payments",           label: "Payments & Fees",    icon: DollarSign },
   ],
   registrar: [
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/registrar/results",         label: "All Results",        icon: FileText },
     { href: "/registrar/graduation",      label: "Graduation",         icon: GraduationCap },
     { href: "/registrar/transcripts",     label: "Transcripts",        icon: ScrollText },
   ],
   hod: [
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/hod/courses",              label: "Manage Courses",     icon: BookOpen },
     { href: "/hod/timetable",            label: "Timetable",          icon: Calendar },
     { href: "/hod/results",              label: "All Results",        icon: FileText },
   ],
   dean: [
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/dean/results",             label: "All Results",        icon: FileText },
     { href: "/dean/graduation",          label: "Graduation",         icon: GraduationCap },
   ],
   lecturer: [
     { href: "/lecturer/dashboard",        label: "Dashboard",          icon: LayoutDashboard },
+    { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/lecturer/timetable",        label: "Teaching Schedule",  icon: Calendar },
     { href: "/lecturer/courses",          label: "My Courses",         icon: BookOpen },
     { href: "/lecturer/students",         label: "Students",           icon: Users },
@@ -56,6 +63,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   ],
   admin: [
     { href: "/admin/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
+    { href: "/admin/announcements",      label: "Announcements",      icon: Megaphone },
     { href: "/admin/timetable",          label: "Timetable",          icon: Calendar },
     { href: "/admin/graduation",         label: "Graduation",         icon: GraduationCap },
     { href: "/admin/hostel",             label: "Hostel",             icon: Home },
@@ -76,6 +84,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   ],
   super_admin: [
     { href: "/admin/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
+    { href: "/admin/announcements",      label: "Announcements",      icon: Megaphone },
     { href: "/admin/timetable",          label: "Timetable",          icon: Calendar },
     { href: "/admin/graduation",         label: "Graduation",         icon: GraduationCap },
     { href: "/admin/hostel",             label: "Hostel",             icon: Home },

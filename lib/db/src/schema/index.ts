@@ -17,3 +17,4 @@ export * from "./hostel";
 export * from "./disciplinary";
 export * from "./appeals";
 export * from "./welfare";
+export * from "./announcements";

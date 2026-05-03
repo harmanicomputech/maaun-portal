@@ -30,8 +30,26 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   hod: [
     "view_courses", "manage_courses", "enter_results", "approve_results", "view_timetable",
   ],
+  counsellor: [
+    "view_assigned_welfare_cases", "manage_welfare_cases",
+    "add_private_notes", "add_shared_notes", "close_welfare_cases",
+    "view_announcements",
+  ],
+  bursar: [
+    "view_payments", "confirm_payments", "reverse_payments", "view_financial_reports",
+    "view_announcements",
+  ],
+  registrar: [
+    "approve_results", "approve_graduation", "view_courses", "manage_courses",
+    "view_transcripts", "view_announcements",
+  ],
+  hod: [
+    "view_courses", "manage_courses", "enter_results", "approve_results", "view_timetable",
+    "view_announcements",
+  ],
   dean: [
     "view_courses", "approve_results", "approve_graduation", "view_timetable",
+    "view_announcements",
   ],
   admin: [
     "view_courses", "manage_courses", "enter_results", "approve_results",

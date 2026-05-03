@@ -51,6 +51,8 @@ import AdminHostel from "@/pages/admin/hostel";
 import AdminDisciplinary from "@/pages/admin/disciplinary";
 import AdminWelfare from "@/pages/admin/welfare";
 import AdminUserManagement from "@/pages/admin/user-management";
+import AdminAnnouncements from "@/pages/admin/announcements";
+import AnnouncementsPage from "@/pages/announcements";
 import CounsellorWelfare from "@/pages/counsellor/welfare";
 
 const queryClient = new QueryClient({
@@ -113,6 +115,10 @@ function Router() {
       <Route path="/admin/welfare"><AppLayout><AdminWelfare /></AppLayout></Route>
 
       <Route path="/admin/user-management"><AppLayout><AdminUserManagement /></AppLayout></Route>
+      <Route path="/admin/announcements"><AppLayout><AdminAnnouncements /></AppLayout></Route>
+
+      {/* Shared Announcements — all roles */}
+      <Route path="/announcements"><AppLayout><AnnouncementsPage /></AppLayout></Route>
 
       {/* Counsellor Routes */}
       <Route path="/counsellor/welfare"><AppLayout><CounsellorWelfare /></AppLayout></Route>
