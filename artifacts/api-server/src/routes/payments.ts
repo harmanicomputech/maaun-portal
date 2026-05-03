@@ -145,7 +145,7 @@ router.post("/payments/initialize", requireAuth, async (req, res) => {
         email: user.email,
         amount: fee.amount * 100, // Paystack uses kobo
         reference,
-        callback_url: `${process.env.APP_URL || ""}/student/payments?ref=${reference}`,
+        callback_url: `${process.env.APP_URL || (process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}` : "")}/student/payments?ref=${reference}`,
         metadata: { feeId: fee.id, userId, feeName: fee.name },
       },
       { headers: { Authorization: `Bearer ${PAYSTACK_SECRET}`, "Content-Type": "application/json" } }

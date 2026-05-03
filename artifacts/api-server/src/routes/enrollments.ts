@@ -37,17 +37,27 @@ async function enrichEnrollment(e: typeof enrollmentsTable.$inferSelect) {
 }
 
 router.get("/enrollments", requireAuth, async (req: AuthRequest, res) => {
+  const role = req.user?.role;
   const { studentId, courseId, semester, academicYear } = req.query;
 
-  let rows = await db.select().from(enrollmentsTable);
+  // Students can only view their own enrollments
+  if (role === "student") {
+    const [student] = await db.select().from(studentsTable).where(eq(studentsTable.userId, req.user!.userId)).limit(1);
+    if (!student) return res.status(403).json({ error: "Student profile not found" });
+    let rows = await db.select().from(enrollmentsTable).where(eq(enrollmentsTable.studentId, student.id));
+    if (courseId) rows = rows.filter(e => e.courseId === parseInt(courseId as string));
+    if (semester) rows = rows.filter(e => e.semester === semester);
+    if (academicYear) rows = rows.filter(e => e.academicYear === academicYear);
+    return res.json(await Promise.all(rows.map(enrichEnrollment)));
+  }
 
+  // Staff roles: all enrollments with optional filters
+  let rows = await db.select().from(enrollmentsTable);
   if (studentId) rows = rows.filter(e => e.studentId === parseInt(studentId as string));
   if (courseId) rows = rows.filter(e => e.courseId === parseInt(courseId as string));
   if (semester) rows = rows.filter(e => e.semester === semester);
   if (academicYear) rows = rows.filter(e => e.academicYear === academicYear);
-
-  const enriched = await Promise.all(rows.map(enrichEnrollment));
-  return res.json(enriched);
+  return res.json(await Promise.all(rows.map(enrichEnrollment)));
 });
 
 router.post("/enrollments", requireAuth, async (req: AuthRequest, res) => {
