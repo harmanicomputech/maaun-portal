@@ -1,41 +1,43 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sidebar } from "./sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationBell } from "./notification-bell";
 
 const PAGE_TITLES: Record<string, string> = {
-  dashboard:        "Dashboard",
-  courses:          "Courses",
-  enrollments:      "My Enrollments",
-  results:          "Academic Results",
-  profile:          "My Profile",
-  payments:         "Fee Payments",
-  receipts:         "Receipts",
-  timetable:        "Timetable",
-  notifications:    "Notifications",
+  dashboard:           "Dashboard",
+  courses:             "Courses",
+  enrollments:         "My Enrollments",
+  results:             "Academic Results",
+  profile:             "My Profile",
+  payments:            "Fee Payments",
+  receipts:            "Receipts",
+  timetable:           "Timetable",
+  notifications:       "Notifications",
   "academic-standing": "Academic Standing",
-  graduation:       "Graduation",
-  hostel:           "Hostel",
-  disciplinary:     "Disciplinary",
-  welfare:          "Welfare & Support",
-  students:         "Students",
-  lecturers:        "Lecturers",
-  sessions:         "Academic Sessions",
-  finance:          "Financial Records",
-  transcripts:      "Transcripts",
-  "activity-logs":  "Activity Logs",
-  "user-management":"User Management",
-  announcements:    "Announcements",
-  appeals:          "Appeals",
+  graduation:          "Graduation",
+  hostel:              "Hostel",
+  disciplinary:        "Disciplinary",
+  welfare:             "Welfare & Support",
+  students:            "Students",
+  lecturers:           "Lecturers",
+  sessions:            "Academic Sessions",
+  finance:             "Financial Records",
+  transcripts:         "Transcripts",
+  "activity-logs":     "Activity Logs",
+  "user-management":   "User Management",
+  announcements:       "Announcements",
+  appeals:             "Appeals",
 };
 
 export function TopHeader() {
   const [location] = useLocation();
   const { user } = useAuth();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const getPageTitle = () => {
     const segments = location.split("/").filter(Boolean);
@@ -52,16 +54,31 @@ export function TopHeader() {
 
   return (
     <header className="h-16 border-b bg-card/90 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-10">
-      {/* Left: mobile menu + page title */}
+      {/* Left: mobile menu trigger + page title */}
       <div className="flex items-center gap-3">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="w-5 h-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64">
-            <Sidebar />
+        {/* Hamburger — visible on mobile only */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+        </Button>
+
+        {/* Mobile slide-in drawer */}
+        <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <SheetContent
+            side="left"
+            className="p-0 w-64 bg-primary border-0"
+            aria-label="Navigation menu"
+          >
+            {/*
+              Pass mobile=true so Sidebar renders without its own hidden md:flex class.
+              Pass onClose so clicking any nav link closes the drawer.
+            */}
+            <Sidebar mobile onClose={() => setDrawerOpen(false)} />
           </SheetContent>
         </Sheet>
 
@@ -75,12 +92,10 @@ export function TopHeader() {
         </div>
       </div>
 
-      {/* Right: bell + user */}
+      {/* Right: bell + user avatar */}
       <div className="flex items-center gap-2">
-        {/* Notification bell — only when authenticated */}
         {user && <NotificationBell />}
 
-        {/* User avatar */}
         {user && (
           <div className="flex items-center gap-2.5 pl-2 border-l ml-1">
             <div className="hidden sm:block text-right">

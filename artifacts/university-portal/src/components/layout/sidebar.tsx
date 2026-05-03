@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> = {
   student: [
@@ -127,7 +127,18 @@ const ROLE_DISPLAY: Record<string, { label: string; color: string }> = {
   super_admin: { label: "Super Admin",  color: "text-red-300" },
 };
 
-export function Sidebar() {
+interface SidebarProps {
+  /**
+   * When true the sidebar fills its container without any visibility hiding classes.
+   * Use this when rendering inside a mobile drawer/sheet.
+   * When false (default) the sidebar is hidden on small screens and visible on md+.
+   */
+  mobile?: boolean;
+  /** Called after a nav link is clicked — use to close the mobile drawer. */
+  onClose?: () => void;
+}
+
+export function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -143,9 +154,21 @@ export function Sidebar() {
     logout();
   };
 
+  const handleLinkClick = () => {
+    onClose?.();
+  };
+
   return (
     <>
-      <div className="w-64 bg-primary text-primary-foreground h-full flex flex-col hidden md:flex shrink-0">
+      {/*
+        Desktop:  hidden on < md, shown as flex on md+      (mobile=false)
+        Mobile:   always shown as flex — the Sheet controls visibility  (mobile=true)
+      */}
+      <div
+        className={`w-64 bg-primary text-primary-foreground h-full flex flex-col shrink-0 ${
+          mobile ? "flex" : "hidden md:flex"
+        }`}
+      >
         {/* Logo */}
         <div className="p-5 pb-3">
           <h1 className="text-xl font-bold tracking-tight leading-tight">MAAUN</h1>
@@ -168,13 +191,13 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* Nav links */}
+        {/* Nav links — scrollable so long lists never get cut off */}
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-2">
           {links.map((link) => {
             const Icon = link.icon;
             const isActive = location === link.href || location.startsWith(link.href + "/");
             return (
-              <Link key={link.href} href={link.href}>
+              <Link key={link.href} href={link.href} onClick={handleLinkClick}>
                 <div
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 cursor-pointer ${
                     isActive
@@ -193,7 +216,7 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Logout button */}
+        {/* Sign out */}
         <div className="p-3 border-t border-white/10">
           <Button
             variant="ghost"
@@ -206,7 +229,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* ── Logout confirmation modal ──────────────────────────────────────── */}
+      {/* ── Logout confirmation modal ───────────────────────────────────── */}
       <Dialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
         <DialogContent className="max-w-sm rounded-2xl">
           <DialogHeader>

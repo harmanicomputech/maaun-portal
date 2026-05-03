@@ -1,0 +1,126 @@
+PHASE 41: Full System Stability, Route Integrity & Cross-Role Validation Audit
+
+OBJECTIVE:
+Perform a final system-wide audit to ensure all roles, dashboards, APIs, and navigation flows are fully consistent, stable, and production-ready after the Role-Based Routing Fix.
+
+DO NOT add new features.
+ONLY verify correctness, consistency, and stability.
+
+--------------------------------------------------
+1. ROLE ROUTE CONSISTENCY CHECK
+--------------------------------------------------
+
+Verify:
+
+- Every role in ROLE_DASHBOARD_MAP has a valid route
+- Every route has a corresponding page component
+- No orphan or duplicate dashboard routes exist
+
+Confirm roles:
+
+- student
+- lecturer
+- counsellor
+- bursar
+- registrar
+- hod
+- dean
+- admin
+- super_admin
+
+--------------------------------------------------
+2. LOGIN → DASHBOARD FLOW TEST
+--------------------------------------------------
+
+Simulate login for each role:
+
+For each role:
+
+- login
+- confirm correct redirect
+- refresh page
+- confirm session restores to correct dashboard
+- logout → confirm redirect to login
+
+--------------------------------------------------
+3. ROUTE GUARD VALIDATION
+--------------------------------------------------
+
+Test unauthorized access:
+
+- student → /admin/dashboard
+- lecturer → /bursar/dashboard
+- bursar → /hod/dashboard
+
+Expected:
+
+- automatic redirect to correct dashboard
+- no data leakage
+- no partial rendering
+
+--------------------------------------------------
+4. API ROLE PERMISSION ALIGNMENT
+--------------------------------------------------
+
+Verify backend matches frontend roles:
+
+- counsellor → welfare only
+- bursar → finance only
+- registrar → transcripts + graduation
+- hod → courses + timetable
+- dean → academic oversight only
+- admin → full access
+- super_admin → full override
+
+Ensure no mismatches between UI and API permissions.
+
+--------------------------------------------------
+5. SESSION PERSISTENCE CHECK
+--------------------------------------------------
+
+Verify:
+
+- refresh keeps user logged in
+- role remains intact
+- dashboard remains correct after reload
+- no fallback to incorrect route
+
+--------------------------------------------------
+6. NAVIGATION INTEGRITY TEST
+--------------------------------------------------
+
+Check:
+
+- sidebar links match role permissions
+- no broken links
+- no outdated /superadmin routes
+- all dashboards accessible via sidebar home link
+
+--------------------------------------------------
+7. ERROR SURFACE CHECK
+--------------------------------------------------
+
+Ensure:
+
+- no blank screens on invalid routes
+- no "Redirecting..." stuck states
+- all fallback routes behave correctly
+
+--------------------------------------------------
+8. FINAL REPORT
+--------------------------------------------------
+
+Output:
+
+- all roles tested (PASS/FAIL)
+- routing consistency status
+- any broken route or mismatch
+- any API mismatch discovered
+
+--------------------------------------------------
+END RESULT:
+
+A fully stable multi-role ERP system with:
+- consistent routing
+- correct role isolation
+- production-safe navigation
