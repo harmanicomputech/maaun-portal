@@ -57,6 +57,7 @@ import AdminWelfare from "@/pages/admin/welfare";
 import AdminUserManagement from "@/pages/admin/user-management";
 import AdminAnnouncements from "@/pages/admin/announcements";
 import AnnouncementsPage from "@/pages/announcements";
+import CalendarPage from "@/pages/calendar";
 
 import CounsellorDashboard from "@/pages/counsellor/dashboard";
 import CounsellorWelfare from "@/pages/counsellor/welfare";
@@ -162,6 +163,7 @@ function Router() {
 
       {/* ── Shared (all authenticated roles) ─────────────────────────── */}
       <Route path="/announcements"><AppLayout><AnnouncementsPage /></AppLayout></Route>
+      <Route path="/calendar"><AppLayout><CalendarPage /></AppLayout></Route>
 
       {/* ── Root redirect ────────────────────────────────────────────── */}
       <Route path="/"><RootRedirect /></Route>

@@ -1,0 +1,120 @@
+PHASE 45: Unified Academic Calendar & Event Aggregation Engine
+
+OBJECTIVE:
+Build a centralized academic calendar system that aggregates ALL time-based events across the MAAUN portal into a single role-aware timeline view.
+
+This is NOT just a UI calendar.
+It is a SYSTEM-WIDE EVENT CONSOLIDATION LAYER.
+
+DO NOT duplicate data.
+ONLY aggregate from existing modules.
+
+--------------------------------------------------
+1. EVENT AGGREGATION ENGINE
+--------------------------------------------------
+
+Create a unified event source:
+
+getAcademicEvents(role, userId)
+
+Aggregates from:
+
+- Timetable (lectures, venue schedules)
+- Announcements (deadline + expiry dates)
+- Exams (from results/academic sessions)
+- Payments deadlines (finance system)
+- Hostel allocations (move-in dates, deadlines)
+- Graduation milestones
+- Welfare case timelines (status changes)
+- Disciplinary actions (sanction periods)
+
+--------------------------------------------------
+2. ROLE-BASED FILTERING
+--------------------------------------------------
+
+Each role sees only relevant events:
+
+student → timetable, exams, fees, hostel, announcements
+lecturer → timetable, results deadlines, announcements
+counsellor → welfare + disciplinary events
+bursar → payment deadlines, finance cycles
+registrar → graduation, transcripts, academic sessions
+hod → department timetable + exams
+dean → academic-wide events
+admin → all events
+super_admin → all events
+
+--------------------------------------------------
+3. EVENT STANDARD FORMAT
+--------------------------------------------------
+
+Normalize all events into:
+
+{
+  id: string,
+  title: string,
+  type: "class | exam | payment | hostel | welfare | disciplinary | announcement | graduation",
+  startDate: Date,
+  endDate?: Date,
+  location?: string,
+  roleScope: string[],
+  route: string
+}
+
+--------------------------------------------------
+4. BACKEND ENDPOINT
+--------------------------------------------------
+
+Create:
+
+GET /api/calendar?role=xxx
+
+Returns:
+- filtered events
+- grouped by week/month
+- sorted by date
+
+--------------------------------------------------
+5. FRONTEND CALENDAR UI
+--------------------------------------------------
+
+Create /calendar page:
+
+DESKTOP:
+- monthly grid view (Google Calendar style)
+- color-coded event types
+- hover tooltips with full event details
+
+MOBILE:
+- vertical agenda list grouped by date
+
+FEATURES:
+- click event → navigate to relevant module
+- role-aware filtering automatically applied
+- toggle: Month / Week / Agenda view
+
+--------------------------------------------------
+6. INTEGRATION POINTS
+--------------------------------------------------
+
+Link calendar into:
+- sidebar navigation (all roles)
+- global search results
+- dashboard quick access card
+
+--------------------------------------------------
+7. PERFORMANCE RULES
+--------------------------------------------------
+
+- cache events per role
+- lazy load monthly chunks
+- avoid recomputing aggregation on every render
+
+--------------------------------------------------
+END RESULT:
+
+A unified institutional calendar system that:
+- merges all academic time-based data
+- gives users a single source of truth for schedules
+- enhances navigation across the entire ERP
+- removes fragmented date/event systems

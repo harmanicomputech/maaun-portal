@@ -21,6 +21,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   student: [
     { href: "/student/dashboard",         label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/student/timetable",         label: "My Timetable",       icon: Calendar },
     { href: "/student/courses",           label: "Browse Courses",     icon: BookOpen },
     { href: "/student/enrollments",       label: "My Enrollments",     icon: GraduationCap },
@@ -38,17 +39,20 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   counsellor: [
     { href: "/counsellor/dashboard",      label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/counsellor/welfare",        label: "My Assigned Cases",  icon: Heart },
   ],
   bursar: [
     { href: "/bursar/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/bursar/finance",            label: "Finance & Receipts", icon: Receipt },
     { href: "/bursar/payments",           label: "Payments & Fees",    icon: DollarSign },
   ],
   registrar: [
     { href: "/registrar/dashboard",       label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/registrar/results",         label: "All Results",        icon: FileText },
     { href: "/registrar/graduation",      label: "Graduation",         icon: GraduationCap },
     { href: "/registrar/transcripts",     label: "Transcripts",        icon: ScrollText },
@@ -56,6 +60,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   hod: [
     { href: "/hod/dashboard",             label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/hod/courses",               label: "Manage Courses",     icon: BookOpen },
     { href: "/hod/timetable",             label: "Timetable",          icon: Calendar },
     { href: "/hod/results",               label: "All Results",        icon: FileText },
@@ -63,12 +68,14 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   dean: [
     { href: "/dean/dashboard",            label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/dean/results",              label: "All Results",        icon: FileText },
     { href: "/dean/graduation",           label: "Graduation",         icon: GraduationCap },
   ],
   lecturer: [
     { href: "/lecturer/dashboard",        label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/lecturer/timetable",        label: "Teaching Schedule",  icon: Calendar },
     { href: "/lecturer/courses",          label: "My Courses",         icon: BookOpen },
     { href: "/lecturer/students",         label: "Students",           icon: Users },
@@ -78,6 +85,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   admin: [
     { href: "/admin/dashboard",           label: "Dashboard",          icon: LayoutDashboard },
     { href: "/admin/announcements",       label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/admin/timetable",           label: "Timetable",          icon: Calendar },
     { href: "/admin/graduation",          label: "Graduation",         icon: GraduationCap },
     { href: "/admin/hostel",              label: "Hostel",             icon: Home },
@@ -99,6 +107,7 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
   super_admin: [
     { href: "/admin/dashboard",           label: "Dashboard",          icon: LayoutDashboard },
     { href: "/admin/announcements",       label: "Announcements",      icon: Megaphone },
+    { href: "/calendar",                  label: "Academic Calendar",  icon: CalendarDays },
     { href: "/admin/timetable",           label: "Timetable",          icon: Calendar },
     { href: "/admin/graduation",          label: "Graduation",         icon: GraduationCap },
     { href: "/admin/hostel",              label: "Hostel",             icon: Home },

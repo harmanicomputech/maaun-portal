@@ -18,6 +18,9 @@ Full-stack University Management Portal for Maryam Abacha American University of
 - Phase 28: Welfare System (welfare_cases, welfare_assignments, welfare_notes + counsellor role)
 - Phase 30: RBAC — 9 roles, ROLE_PERMISSIONS map, requirePermission middleware, User Management page
 - Phase 31: Announcement & Broadcast System (announcements table, targeting engine, admin management, student dashboard integration)
+- Phase 43: Sidebar notification badges — unread count derived from NotificationContext, color-coded per type
+- Phase 44: Global Search — `GET /api/search?q=` ILIKE across 6 categories, role-gated server-side, Ctrl+K CommandDialog UI, 300ms debounce + LRU cache
+- Phase 45: Academic Calendar — `GET /api/calendar?month=YYYY-MM` aggregates timetable (weekly recurring → expanded to dates), announcements, payments, disciplinary, graduation, welfare, hostel events. Monthly grid + agenda views, 7 color-coded event types, click-to-navigate, role-filtered. Sidebar Calendar link for all 9 roles at `/calendar`.
 
 ## DB Tables
 
