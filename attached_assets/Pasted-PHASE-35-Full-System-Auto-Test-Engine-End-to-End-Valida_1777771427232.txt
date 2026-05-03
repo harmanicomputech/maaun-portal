@@ -1,0 +1,199 @@
+PHASE 35: Full System Auto-Test Engine (End-to-End Validation)
+
+OBJECTIVE:
+Automatically simulate real-world usage across all modules and roles to verify that every feature works correctly and no hidden bugs remain.
+
+--------------------------------------------------
+1. TEST RUNNER SETUP
+--------------------------------------------------
+
+Create a test runner script:
+
+- /scripts/system-test.ts
+
+It should:
+
+- authenticate users for all roles
+- simulate actions via API calls
+- log pass/fail results
+
+--------------------------------------------------
+2. TEST ALL ROLES
+--------------------------------------------------
+
+Login and store tokens for:
+
+- student
+- lecturer
+- counsellor
+- bursar
+- registrar
+- hod
+- dean
+- admin
+- super_admin
+
+--------------------------------------------------
+3. STUDENT FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- fetch dashboard
+- fetch courses
+- register course
+- view results
+- fetch academic standing
+- fetch announcements
+- fetch notifications
+- apply for hostel (if eligible)
+- submit welfare case
+
+--------------------------------------------------
+4. LECTURER FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- fetch assigned courses
+- fetch students
+- input result (CA + exam)
+- submit result
+
+--------------------------------------------------
+5. ADMIN FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- create course
+- update course
+- delete course
+- fetch all students
+- manage results
+- manage timetable
+- manage announcements
+
+--------------------------------------------------
+6. FINANCE FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- initialize Paystack payment
+- verify payment
+- confirm receipt
+- check ledger update
+
+--------------------------------------------------
+7. GRADUATION FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- compute clearance
+- apply for graduation
+- approve/reject (admin)
+
+--------------------------------------------------
+8. HOSTEL FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- apply for hostel
+- run auto-allocation
+- verify bed assignment
+
+--------------------------------------------------
+9. DISCIPLINARY FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- create case
+- apply sanction
+- verify flags block other modules
+
+--------------------------------------------------
+10. APPEALS FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- submit appeal
+- admin review
+- decision (modify/dismiss)
+
+--------------------------------------------------
+11. WELFARE FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- submit case
+- assign counsellor
+- add notes
+- update status
+
+--------------------------------------------------
+12. TRANSCRIPT FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- create transcript
+- approve
+- finalize
+- verify public endpoint
+
+--------------------------------------------------
+13. ANNOUNCEMENT FLOW TEST
+--------------------------------------------------
+
+Simulate:
+
+- create announcement
+- verify targeting works
+- verify expiry filtering
+
+--------------------------------------------------
+14. NOTIFICATION SYSTEM TEST
+--------------------------------------------------
+
+Simulate:
+
+- trigger events (result, payment, hostel, etc.)
+- verify notifications created
+- verify unread count updates
+
+--------------------------------------------------
+15. FAILURE DETECTION
+--------------------------------------------------
+
+For each step:
+
+- log:
+  PASS / FAIL
+  endpoint
+  response status
+
+If failure:
+- log error message
+- continue testing (do not stop entire run)
+
+--------------------------------------------------
+16. FINAL REPORT
+--------------------------------------------------
+
+Output:
+
+- total tests run
+- total passed
+- total failed
+- list of failing endpoints
+
+--------------------------------------------------
+END RESULT:
+
+System is fully validated across all modules and roles.

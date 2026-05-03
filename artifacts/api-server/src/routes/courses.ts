@@ -2,7 +2,7 @@ import { Router } from "express";
 import { eq } from "drizzle-orm";
 import { db, coursesTable, lecturersTable, usersTable } from "@workspace/db";
 import { CreateCourseBody } from "@workspace/api-zod";
-import { requireAuth } from "../lib/auth-middleware";
+import { requireAuth, requireRole } from "../lib/auth-middleware";
 
 const router = Router();
 
@@ -68,7 +68,7 @@ router.get("/courses/:id", async (req, res) => {
   return res.json({ ...course, createdAt: course.createdAt.toISOString() });
 });
 
-router.post("/courses", requireAuth, async (req, res) => {
+router.post("/courses", requireAuth, requireRole("admin", "super_admin", "lecturer", "hod", "dean", "registrar"), async (req, res) => {
   const parsed = CreateCourseBody.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Validation failed", message: parsed.error.message });
@@ -78,7 +78,7 @@ router.post("/courses", requireAuth, async (req, res) => {
   return res.status(201).json({ ...course, createdAt: course.createdAt.toISOString(), lecturerName: null });
 });
 
-router.put("/courses/:id", requireAuth, async (req, res) => {
+router.put("/courses/:id", requireAuth, requireRole("admin", "super_admin", "lecturer", "hod", "dean", "registrar"), async (req, res) => {
   const id = parseInt(req.params.id);
   const parsed = CreateCourseBody.safeParse(req.body);
   if (!parsed.success) {
@@ -90,7 +90,7 @@ router.put("/courses/:id", requireAuth, async (req, res) => {
   return res.json({ ...course, createdAt: course.createdAt.toISOString(), lecturerName: null });
 });
 
-router.delete("/courses/:id", requireAuth, async (req, res) => {
+router.delete("/courses/:id", requireAuth, requireRole("admin", "super_admin"), async (req, res) => {
   const id = parseInt(req.params.id);
   await db.delete(coursesTable).where(eq(coursesTable.id, id));
   return res.json({ message: "Course deleted successfully." });
