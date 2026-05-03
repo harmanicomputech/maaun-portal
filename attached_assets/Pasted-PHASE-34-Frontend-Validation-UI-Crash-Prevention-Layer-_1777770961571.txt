@@ -1,0 +1,109 @@
+PHASE 34: Frontend Validation + UI Crash Prevention Layer
+
+OBJECTIVE:
+Prevent all user-input crashes and enforce safe UI patterns across the entire application.
+
+--------------------------------------------------
+1. GLOBAL SELECT SAFETY RULE
+--------------------------------------------------
+
+Rule:
+
+- NEVER use empty string ("") in any <SelectItem value="">
+- Use sentinel values:
+  "none", "unassigned", or actual IDs
+
+Scan entire frontend:
+
+- Find all SelectItem components
+- Replace any value="" with safe value
+
+--------------------------------------------------
+2. FORM VALIDATION (FRONTEND)
+--------------------------------------------------
+
+For all forms:
+
+- Add required field validation before submit:
+  - course code
+  - title
+  - unit
+  - department
+
+- Show inline errors:
+  - red text under field
+  - no API call if invalid
+
+--------------------------------------------------
+3. SAFE SUBMISSION LAYER
+--------------------------------------------------
+
+Before sending request:
+
+- sanitize payload
+- convert "none" → null
+- ensure IDs are numbers
+
+--------------------------------------------------
+4. ERROR BOUNDARY (CRITICAL)
+--------------------------------------------------
+
+Wrap major pages with React Error Boundary:
+
+- Admin pages
+- Student dashboard
+- Forms
+
+If crash occurs:
+- show fallback UI instead of blank screen
+
+--------------------------------------------------
+5. GLOBAL FORM UTIL (RECOMMENDED)
+--------------------------------------------------
+
+Create reusable form helper:
+
+- validateRequired(fields)
+- normalizeSelectValues(data)
+
+--------------------------------------------------
+6. USER FEEDBACK IMPROVEMENT
+--------------------------------------------------
+
+Replace silent failures with:
+
+- toast notifications:
+  "Course created successfully"
+  "Please fill all required fields"
+
+--------------------------------------------------
+7. API ERROR DISPLAY
+--------------------------------------------------
+
+If backend returns error:
+
+- display readable message
+- do NOT crash UI
+
+--------------------------------------------------
+8. FINAL VALIDATION TEST
+--------------------------------------------------
+
+Test:
+
+- empty form submission
+- invalid select values
+- missing department
+- lecturer not assigned
+
+Ensure:
+
+- no crashes
+- clear user feedback
+
+--------------------------------------------------
+END RESULT:
+
+- No UI crashes from user input
+- All forms safe and validated
+- Better UX across system

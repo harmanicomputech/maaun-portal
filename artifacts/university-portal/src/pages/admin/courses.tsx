@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Pencil, Trash2, Loader2, Search, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { validateRequired, hasErrors, type FormErrors } from "@/lib/form-utils";
 
 type CourseForm = { courseCode: string; title: string; unit: string; department: string; faculty: string; level: string; semester: string; description: string; lecturerId: string };
 const emptyForm: CourseForm = { courseCode: "", title: "", unit: "3", department: "", faculty: "", level: "100", semester: "first", description: "", lecturerId: "none" };
@@ -22,43 +23,61 @@ export default function AdminCourses() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<number | null>(null);
   const [form, setForm] = useState<CourseForm>(emptyForm);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const { data: courses = [], isLoading } = useListCourses();
   const { data: lecturers = [] } = useListLecturers();
 
   const createMutation = useCreateCourse({
     mutation: {
-      onSuccess: () => { toast({ title: "Course created" }); queryClient.invalidateQueries({ queryKey: getListCoursesQueryKey() }); closeDialog(); },
-      onError: () => toast({ title: "Failed to create course", variant: "destructive" }),
+      onSuccess: () => { toast({ title: "Course created successfully" }); queryClient.invalidateQueries({ queryKey: getListCoursesQueryKey() }); closeDialog(); },
+      onError: (err: any) => toast({ title: err?.response?.data?.error ?? "Failed to create course", variant: "destructive" }),
     },
   });
 
   const updateMutation = useUpdateCourse({
     mutation: {
-      onSuccess: () => { toast({ title: "Course updated" }); queryClient.invalidateQueries({ queryKey: getListCoursesQueryKey() }); closeDialog(); },
-      onError: () => toast({ title: "Failed to update course", variant: "destructive" }),
+      onSuccess: () => { toast({ title: "Course updated successfully" }); queryClient.invalidateQueries({ queryKey: getListCoursesQueryKey() }); closeDialog(); },
+      onError: (err: any) => toast({ title: err?.response?.data?.error ?? "Failed to update course", variant: "destructive" }),
     },
   });
 
   const deleteMutation = useDeleteCourse({
     mutation: {
       onSuccess: () => { toast({ title: "Course deleted" }); queryClient.invalidateQueries({ queryKey: getListCoursesQueryKey() }); },
-      onError: () => toast({ title: "Failed to delete", variant: "destructive" }),
+      onError: () => toast({ title: "Failed to delete course", variant: "destructive" }),
     },
   });
 
-  const closeDialog = () => { setDialogOpen(false); setEditing(null); setForm(emptyForm); };
+  const closeDialog = () => { setDialogOpen(false); setEditing(null); setForm(emptyForm); setErrors({}); };
 
-  const openNew = () => { setEditing(null); setForm(emptyForm); setDialogOpen(true); };
+  const openNew = () => { setEditing(null); setForm(emptyForm); setErrors({}); setDialogOpen(true); };
 
   const openEdit = (course: any) => {
     setEditing(course.id);
+    setErrors({});
     setForm({ courseCode: course.courseCode, title: course.title, unit: String(course.unit), department: course.department, faculty: course.faculty, level: course.level, semester: course.semester, description: course.description || "", lecturerId: course.lecturerId ? String(course.lecturerId) : "none" });
     setDialogOpen(true);
   };
 
+  const setField = (key: keyof CourseForm, value: string) => {
+    setForm(f => ({ ...f, [key]: value }));
+    if (errors[key]) setErrors(e => { const n = { ...e }; delete n[key]; return n; });
+  };
+
   const handleSubmit = () => {
-    const data = { courseCode: form.courseCode, title: form.title, unit: parseInt(form.unit), department: form.department, faculty: form.faculty, level: form.level, semester: form.semester as "first" | "second", description: form.description || undefined, lecturerId: (form.lecturerId && form.lecturerId !== "none") ? parseInt(form.lecturerId) : undefined };
+    const errs = validateRequired({
+      courseCode: { value: form.courseCode, label: "Course code" },
+      title:      { value: form.title,      label: "Title" },
+      department: { value: form.department, label: "Department" },
+      faculty:    { value: form.faculty,    label: "Faculty" },
+    });
+    if (hasErrors(errs)) {
+      setErrors(errs);
+      toast({ title: "Please fill all required fields", variant: "destructive" });
+      return;
+    }
+    const data = { courseCode: form.courseCode.trim(), title: form.title.trim(), unit: parseInt(form.unit) || 3, department: form.department.trim(), faculty: form.faculty.trim(), level: form.level, semester: form.semester as "first" | "second", description: form.description.trim() || undefined, lecturerId: (form.lecturerId && form.lecturerId !== "none") ? parseInt(form.lecturerId) : undefined };
     if (editing !== null) updateMutation.mutate({ id: editing, data });
     else createMutation.mutate({ data });
   };
@@ -112,19 +131,30 @@ export default function AdminCourses() {
         </div>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(o) => { if (!o) closeDialog(); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editing !== null ? "Edit Course" : "Create Course"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div><Label>Course Code</Label><Input value={form.courseCode} onChange={(e) => setForm(f => ({ ...f, courseCode: e.target.value }))} placeholder="CSC 301" data-testid="input-course-code" /></div>
-              <div><Label>Units</Label><Input type="number" min="1" max="6" value={form.unit} onChange={(e) => setForm(f => ({ ...f, unit: e.target.value }))} data-testid="input-units" /></div>
+              <div>
+                <Label>Course Code <span className="text-red-500">*</span></Label>
+                <Input value={form.courseCode} onChange={(e) => setField("courseCode", e.target.value)} placeholder="CSC 301" className={errors.courseCode ? "border-red-400" : ""} data-testid="input-course-code" />
+                {errors.courseCode && <p className="text-xs text-red-500 mt-1">{errors.courseCode}</p>}
+              </div>
+              <div>
+                <Label>Units</Label>
+                <Input type="number" min="1" max="6" value={form.unit} onChange={(e) => setField("unit", e.target.value)} data-testid="input-units" />
+              </div>
             </div>
-            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Introduction to Computing" data-testid="input-title" /></div>
+            <div>
+              <Label>Title <span className="text-red-500">*</span></Label>
+              <Input value={form.title} onChange={(e) => setField("title", e.target.value)} placeholder="Introduction to Computing" className={errors.title ? "border-red-400" : ""} data-testid="input-title" />
+              {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Level</Label>
-                <Select value={form.level} onValueChange={(v) => setForm(f => ({ ...f, level: v }))}>
+                <Select value={form.level} onValueChange={(v) => setField("level", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {["100","200","300","400","500"].map(l => <SelectItem key={l} value={l}>{l} Level</SelectItem>)}
@@ -133,7 +163,7 @@ export default function AdminCourses() {
               </div>
               <div>
                 <Label>Semester</Label>
-                <Select value={form.semester} onValueChange={(v) => setForm(f => ({ ...f, semester: v }))}>
+                <Select value={form.semester} onValueChange={(v) => setField("semester", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="first">First</SelectItem>
@@ -142,11 +172,19 @@ export default function AdminCourses() {
                 </Select>
               </div>
             </div>
-            <div><Label>Department</Label><Input value={form.department} onChange={(e) => setForm(f => ({ ...f, department: e.target.value }))} placeholder="Computer Science" data-testid="input-department" /></div>
-            <div><Label>Faculty</Label><Input value={form.faculty} onChange={(e) => setForm(f => ({ ...f, faculty: e.target.value }))} placeholder="Science and Technology" data-testid="input-faculty" /></div>
+            <div>
+              <Label>Department <span className="text-red-500">*</span></Label>
+              <Input value={form.department} onChange={(e) => setField("department", e.target.value)} placeholder="Computer Science" className={errors.department ? "border-red-400" : ""} data-testid="input-department" />
+              {errors.department && <p className="text-xs text-red-500 mt-1">{errors.department}</p>}
+            </div>
+            <div>
+              <Label>Faculty <span className="text-red-500">*</span></Label>
+              <Input value={form.faculty} onChange={(e) => setField("faculty", e.target.value)} placeholder="Science and Technology" className={errors.faculty ? "border-red-400" : ""} data-testid="input-faculty" />
+              {errors.faculty && <p className="text-xs text-red-500 mt-1">{errors.faculty}</p>}
+            </div>
             <div>
               <Label>Assigned Lecturer (optional)</Label>
-              <Select value={form.lecturerId} onValueChange={(v) => setForm(f => ({ ...f, lecturerId: v }))}>
+              <Select value={form.lecturerId} onValueChange={(v) => setField("lecturerId", v)}>
                 <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
@@ -154,7 +192,10 @@ export default function AdminCourses() {
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Description (optional)</Label><Input value={form.description} onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Course description..." data-testid="input-description" /></div>
+            <div>
+              <Label>Description (optional)</Label>
+              <Input value={form.description} onChange={(e) => setField("description", e.target.value)} placeholder="Course description..." data-testid="input-description" />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>

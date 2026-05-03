@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { validateRequired, hasErrors, type FormErrors } from "@/lib/form-utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,7 @@ export default function AdminDisciplinary() {
   const [detailCase, setDetailCase] = useState<any | null>(null);
   const [statusTarget, setStatusTarget] = useState<{ id: number; current: string } | null>(null);
   const [createForm, setCreateForm] = useState({ studentId: "", title: "", description: "", severity: "minor" });
+  const [createErrors, setCreateErrors] = useState<FormErrors>({});
   const [actionForm, setActionForm] = useState({ actionType: "warning", startDate: "", endDate: "", remarks: "" });
   const [newStatus, setNewStatus] = useState("under_review");
   const [resolutionNote, setResolutionNote] = useState("");
@@ -125,7 +127,7 @@ export default function AdminDisciplinary() {
     mutationFn: async (form: typeof createForm) => {
       const { data } = await axios.post(`${BASE()}/api/disciplinary/admin/cases`, { ...form, studentId: parseInt(form.studentId) }, { headers: authHeaders() }); return data;
     },
-    onSuccess: () => { toast({ title: "Case created" }); invalidateAll(); setCreateOpen(false); setCreateForm({ studentId: "", title: "", description: "", severity: "minor" }); },
+    onSuccess: () => { toast({ title: "Case created successfully" }); invalidateAll(); setCreateOpen(false); setCreateErrors({}); setCreateForm({ studentId: "", title: "", description: "", severity: "minor" }); },
     onError: (err: any) => toast({ title: err?.response?.data?.error ?? "Failed", variant: "destructive" }),
   });
 
@@ -679,22 +681,33 @@ export default function AdminDisciplinary() {
       </Dialog>
 
       {/* ── Create Case Dialog ─────────────────────────────────────────────── */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog open={createOpen} onOpenChange={(o) => { if (!o) { setCreateOpen(false); setCreateErrors({}); } }}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle className="flex items-center gap-2"><Plus className="w-5 h-5 text-primary" />Open Disciplinary Case</DialogTitle></DialogHeader>
           <div className="py-2 space-y-3">
             <div>
               <label className="text-sm font-medium mb-1 block">Student ID <span className="text-red-500">*</span></label>
-              <Input type="number" placeholder="Enter student ID (numeric)" value={createForm.studentId} onChange={e => setCreateForm(p => ({ ...p, studentId: e.target.value }))} />
-              <p className="text-[10px] text-muted-foreground mt-1">Find the student ID from the Students page.</p>
+              <Input type="number" placeholder="Enter student ID (numeric)" value={createForm.studentId}
+                className={createErrors.studentId ? "border-red-400" : ""}
+                onChange={e => { setCreateForm(p => ({ ...p, studentId: e.target.value })); setCreateErrors(er => { const n = { ...er }; delete n.studentId; return n; }); }} />
+              {createErrors.studentId
+                ? <p className="text-xs text-red-500 mt-1">{createErrors.studentId}</p>
+                : <p className="text-[10px] text-muted-foreground mt-1">Find the student ID from the Students page.</p>
+              }
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">Case Title <span className="text-red-500">*</span></label>
-              <Input placeholder="e.g. Academic Misconduct — Exam Irregularity" value={createForm.title} onChange={e => setCreateForm(p => ({ ...p, title: e.target.value }))} />
+              <Input placeholder="e.g. Academic Misconduct — Exam Irregularity" value={createForm.title}
+                className={createErrors.title ? "border-red-400" : ""}
+                onChange={e => { setCreateForm(p => ({ ...p, title: e.target.value })); setCreateErrors(er => { const n = { ...er }; delete n.title; return n; }); }} />
+              {createErrors.title && <p className="text-xs text-red-500 mt-1">{createErrors.title}</p>}
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">Description <span className="text-red-500">*</span></label>
-              <Textarea placeholder="Describe the incident in detail..." rows={3} value={createForm.description} onChange={e => setCreateForm(p => ({ ...p, description: e.target.value }))} />
+              <Textarea placeholder="Describe the incident in detail..." rows={3} value={createForm.description}
+                className={createErrors.description ? "border-red-400" : ""}
+                onChange={e => { setCreateForm(p => ({ ...p, description: e.target.value })); setCreateErrors(er => { const n = { ...er }; delete n.description; return n; }); }} />
+              {createErrors.description && <p className="text-xs text-red-500 mt-1">{createErrors.description}</p>}
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">Severity</label>
@@ -710,9 +723,16 @@ export default function AdminDisciplinary() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
-            <Button disabled={!createForm.studentId || !createForm.title || !createForm.description || createMut.isPending}
-              onClick={() => createMut.mutate(createForm)}>
+            <Button variant="outline" onClick={() => { setCreateOpen(false); setCreateErrors({}); }}>Cancel</Button>
+            <Button disabled={createMut.isPending} onClick={() => {
+              const errs = validateRequired({
+                studentId:   { value: createForm.studentId,   label: "Student ID" },
+                title:       { value: createForm.title,       label: "Case title" },
+                description: { value: createForm.description, label: "Description" },
+              });
+              if (hasErrors(errs)) { setCreateErrors(errs); return; }
+              createMut.mutate(createForm);
+            }}>
               {createMut.isPending ? "Creating..." : "Open Case"}
             </Button>
           </DialogFooter>

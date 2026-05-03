@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Pencil, Loader2, CheckCircle, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { validateRequired, hasErrors, type FormErrors } from "@/lib/form-utils";
 import axios from "axios";
 
 const gradeColors: Record<string, string> = {
@@ -24,11 +25,6 @@ const statusColors: Record<string, string> = {
   approved: "bg-green-100 text-green-700", locked: "bg-blue-100 text-blue-700",
 };
 
-async function apiAction(method: string, url: string, token: string) {
-  const baseUrl = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
-  await axios({ method, url: `${baseUrl}${url}`, headers: { Authorization: `Bearer ${token}` } });
-}
-
 export default function AdminResults() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -37,6 +33,7 @@ export default function AdminResults() {
   const [editingResult, setEditingResult] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [form, setForm] = useState({ studentId: "", courseId: "", semester: "first", academicYear: "2024/2025", caScore: "", examScore: "" });
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const token = localStorage.getItem("maaun_token") || "";
   const { data: students = [] } = useListStudents();
@@ -48,28 +45,61 @@ export default function AdminResults() {
 
   const submitMutation = useSubmitResult({
     mutation: {
-      onSuccess: () => { toast({ title: "Result saved" }); queryClient.invalidateQueries({ queryKey: getListResultsQueryKey() }); closeDialog(); },
-      onError: () => toast({ title: "Failed to save", variant: "destructive" }),
+      onSuccess: () => { toast({ title: "Result saved successfully" }); queryClient.invalidateQueries({ queryKey: getListResultsQueryKey() }); closeDialog(); },
+      onError: (err: any) => toast({ title: err?.response?.data?.error ?? "Failed to save result", variant: "destructive" }),
     },
   });
 
   const updateMutation = useUpdateResult({
     mutation: {
-      onSuccess: () => { toast({ title: "Result updated" }); queryClient.invalidateQueries({ queryKey: getListResultsQueryKey() }); closeDialog(); },
-      onError: () => toast({ title: "Failed to update", variant: "destructive" }),
+      onSuccess: () => { toast({ title: "Result updated successfully" }); queryClient.invalidateQueries({ queryKey: getListResultsQueryKey() }); closeDialog(); },
+      onError: (err: any) => toast({ title: err?.response?.data?.error ?? "Failed to update result", variant: "destructive" }),
     },
   });
 
-  const closeDialog = () => { setDialogOpen(false); setEditingResult(null); setForm({ studentId: "", courseId: "", semester: "first", academicYear: "2024/2025", caScore: "", examScore: "" }); };
-  const openNew = () => { setEditingResult(null); setForm({ studentId: selectedStudentId, courseId: "", semester: "first", academicYear: "2024/2025", caScore: "", examScore: "" }); setDialogOpen(true); };
+  const closeDialog = () => { setDialogOpen(false); setEditingResult(null); setErrors({}); setForm({ studentId: "", courseId: "", semester: "first", academicYear: "2024/2025", caScore: "", examScore: "" }); };
+
+  const openNew = () => { setEditingResult(null); setErrors({}); setForm({ studentId: selectedStudentId, courseId: "", semester: "first", academicYear: "2024/2025", caScore: "", examScore: "" }); setDialogOpen(true); };
+
   const openEdit = (result: any) => {
     setEditingResult(result);
+    setErrors({});
     setForm({ studentId: String(result.studentId), courseId: String(result.courseId), semester: result.semester, academicYear: result.academicYear, caScore: String(result.caScore ?? ""), examScore: String(result.examScore ?? "") });
     setDialogOpen(true);
   };
+
+  const setField = (key: string, value: string) => {
+    setForm(f => ({ ...f, [key]: value }));
+    if (errors[key]) setErrors(e => { const n = { ...e }; delete n[key]; return n; });
+  };
+
   const handleSubmit = () => {
-    if (editingResult) updateMutation.mutate({ id: editingResult.id, data: { caScore: parseFloat(form.caScore), examScore: parseFloat(form.examScore) } });
-    else submitMutation.mutate({ data: { studentId: parseInt(form.studentId), courseId: parseInt(form.courseId), semester: form.semester, academicYear: form.academicYear, caScore: parseFloat(form.caScore) || 0, examScore: parseFloat(form.examScore) || 0 } });
+    const errs: FormErrors = {};
+
+    if (!editingResult) {
+      const baseErrs = validateRequired({
+        studentId: { value: form.studentId, label: "Student" },
+        courseId:  { value: form.courseId,  label: "Course" },
+      });
+      Object.assign(errs, baseErrs);
+    }
+
+    const ca = parseFloat(form.caScore);
+    const exam = parseFloat(form.examScore);
+    if (form.caScore === "" || isNaN(ca) || ca < 0 || ca > 30) errs.caScore = "CA score must be between 0 and 30";
+    if (form.examScore === "" || isNaN(exam) || exam < 0 || exam > 70) errs.examScore = "Exam score must be between 0 and 70";
+
+    if (hasErrors(errs)) {
+      setErrors(errs);
+      toast({ title: "Please fix the highlighted fields", variant: "destructive" });
+      return;
+    }
+
+    if (editingResult) {
+      updateMutation.mutate({ id: editingResult.id, data: { caScore: ca, examScore: exam } });
+    } else {
+      submitMutation.mutate({ data: { studentId: parseInt(form.studentId), courseId: parseInt(form.courseId), semester: form.semester, academicYear: form.academicYear, caScore: ca || 0, examScore: exam || 0 } });
+    }
   };
 
   const handleAction = async (id: number, action: "approve" | "lock") => {
@@ -77,9 +107,11 @@ export default function AdminResults() {
     try {
       const baseUrl = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
       await axios.put(`${baseUrl}/api/results/${id}/${action}`, {}, { headers: { Authorization: `Bearer ${token}` } });
-      toast({ title: `Result ${action}d successfully` });
+      toast({ title: `Result ${action === "approve" ? "approved" : "locked"} successfully` });
       queryClient.invalidateQueries({ queryKey: getListResultsQueryKey() });
-    } catch { toast({ title: `Failed to ${action}`, variant: "destructive" }); }
+    } catch (err: any) {
+      toast({ title: err?.response?.data?.error ?? `Failed to ${action} result`, variant: "destructive" });
+    }
     finally { setActionLoading(null); }
   };
 
@@ -177,40 +209,53 @@ export default function AdminResults() {
         </Card>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(o) => { if (!o) closeDialog(); }}>
         <DialogContent>
           <DialogHeader><DialogTitle>{editingResult ? "Edit Result" : "Submit Result"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             {!editingResult && (
               <>
                 <div>
-                  <Label>Student</Label>
-                  <Select value={form.studentId} onValueChange={(v) => setForm(f => ({ ...f, studentId: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Select student" /></SelectTrigger>
+                  <Label>Student <span className="text-red-500">*</span></Label>
+                  <Select value={form.studentId} onValueChange={(v) => setField("studentId", v)}>
+                    <SelectTrigger className={errors.studentId ? "border-red-400" : ""}><SelectValue placeholder="Select student" /></SelectTrigger>
                     <SelectContent>{students.map(s => <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>)}</SelectContent>
                   </Select>
+                  {errors.studentId && <p className="text-xs text-red-500 mt-1">{errors.studentId}</p>}
                 </div>
                 <div>
-                  <Label>Course</Label>
-                  <Select value={form.courseId} onValueChange={(v) => setForm(f => ({ ...f, courseId: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
+                  <Label>Course <span className="text-red-500">*</span></Label>
+                  <Select value={form.courseId} onValueChange={(v) => setField("courseId", v)}>
+                    <SelectTrigger className={errors.courseId ? "border-red-400" : ""}><SelectValue placeholder="Select course" /></SelectTrigger>
                     <SelectContent>{courses.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.courseCode} — {c.title}</SelectItem>)}</SelectContent>
                   </Select>
+                  {errors.courseId && <p className="text-xs text-red-500 mt-1">{errors.courseId}</p>}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Semester</Label>
-                    <Select value={form.semester} onValueChange={(v) => setForm(f => ({ ...f, semester: v }))}>
+                    <Select value={form.semester} onValueChange={(v) => setField("semester", v)}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="first">First</SelectItem><SelectItem value="second">Second</SelectItem></SelectContent>
                     </Select>
                   </div>
-                  <div><Label>Academic Year</Label><Input value={form.academicYear} onChange={(e) => setForm(f => ({ ...f, academicYear: e.target.value }))} /></div>
+                  <div>
+                    <Label>Academic Year</Label>
+                    <Input value={form.academicYear} onChange={(e) => setField("academicYear", e.target.value)} />
+                  </div>
                 </div>
               </>
             )}
-            <div><Label>CA Score (30 max)</Label><Input type="number" min="0" max="30" value={form.caScore} onChange={(e) => setForm(f => ({ ...f, caScore: e.target.value }))} /></div>
-            <div><Label>Exam Score (70 max)</Label><Input type="number" min="0" max="70" value={form.examScore} onChange={(e) => setForm(f => ({ ...f, examScore: e.target.value }))} /></div>
+            <div>
+              <Label>CA Score (0–30) <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" max="30" value={form.caScore} onChange={(e) => setField("caScore", e.target.value)} className={errors.caScore ? "border-red-400" : ""} />
+              {errors.caScore && <p className="text-xs text-red-500 mt-1">{errors.caScore}</p>}
+            </div>
+            <div>
+              <Label>Exam Score (0–70) <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" max="70" value={form.examScore} onChange={(e) => setField("examScore", e.target.value)} className={errors.examScore ? "border-red-400" : ""} />
+              {errors.examScore && <p className="text-xs text-red-500 mt-1">{errors.examScore}</p>}
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>

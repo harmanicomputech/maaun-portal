@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { validateRequired, hasErrors, type FormErrors } from "@/lib/form-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +71,7 @@ export default function AdminTimetable() {
   const [entryOpen, setEntryOpen] = useState(false);
   const [venueForm, setVenueForm] = useState({ name: "", capacity: "50", location: "" });
   const [entryForm, setEntryForm] = useState({ courseId: "", lecturerId: "", venueId: "", dayOfWeek: "", startTime: "", endTime: "" });
+  const [entryErrors, setEntryErrors] = useState<FormErrors>({});
 
   const { data: timetables = [], isLoading, refetch, isFetching } = useQuery({
     queryKey: ["admin-timetable"],
@@ -111,7 +113,7 @@ export default function AdminTimetable() {
 
   const createEntryMut = useMutation({
     mutationFn: async (p: any) => { const { data } = await axios.post(`${BASE()}/api/timetables`, p, { headers: authHeaders() }); return data; },
-    onSuccess: () => { toast({ title: "Timetable entry added" }); qc.invalidateQueries({ queryKey: ["admin-timetable"] }); setEntryOpen(false); setEntryForm({ courseId: "", lecturerId: "", venueId: "", dayOfWeek: "", startTime: "", endTime: "" }); },
+    onSuccess: () => { toast({ title: "Timetable entry added successfully" }); qc.invalidateQueries({ queryKey: ["admin-timetable"] }); setEntryOpen(false); setEntryErrors({}); setEntryForm({ courseId: "", lecturerId: "", venueId: "", dayOfWeek: "", startTime: "", endTime: "" }); },
     onError: (err: any) => { const msg = err?.response?.data?.message || "Conflict detected"; toast({ title: "Conflict", description: msg, variant: "destructive" }); },
   });
 
@@ -354,60 +356,77 @@ export default function AdminTimetable() {
       </Dialog>
 
       {/* Add Entry (Admin Override) Dialog */}
-      <Dialog open={entryOpen} onOpenChange={setEntryOpen}>
+      <Dialog open={entryOpen} onOpenChange={(o) => { if (!o) { setEntryOpen(false); setEntryErrors({}); } }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Shield className="w-5 h-5 text-primary" />Admin Override — Add Timetable Entry</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <Label>Course</Label>
-              <Select value={entryForm.courseId} onValueChange={v => setEntryForm(f => ({ ...f, courseId: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
+              <Label>Course <span className="text-red-500">*</span></Label>
+              <Select value={entryForm.courseId} onValueChange={v => { setEntryForm(f => ({ ...f, courseId: v })); setEntryErrors(e => { const n = { ...e }; delete n.courseId; return n; }); }}>
+                <SelectTrigger className={entryErrors.courseId ? "border-red-400" : ""}><SelectValue placeholder="Select course" /></SelectTrigger>
                 <SelectContent>{courses.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{c.courseCode} — {c.title}</SelectItem>)}</SelectContent>
               </Select>
+              {entryErrors.courseId && <p className="text-xs text-red-500 mt-1">{entryErrors.courseId}</p>}
             </div>
             <div>
-              <Label>Lecturer</Label>
-              <Select value={entryForm.lecturerId} onValueChange={v => setEntryForm(f => ({ ...f, lecturerId: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select lecturer" /></SelectTrigger>
+              <Label>Lecturer <span className="text-red-500">*</span></Label>
+              <Select value={entryForm.lecturerId} onValueChange={v => { setEntryForm(f => ({ ...f, lecturerId: v })); setEntryErrors(e => { const n = { ...e }; delete n.lecturerId; return n; }); }}>
+                <SelectTrigger className={entryErrors.lecturerId ? "border-red-400" : ""}><SelectValue placeholder="Select lecturer" /></SelectTrigger>
                 <SelectContent>{lecturers.map((l: any) => <SelectItem key={l.id} value={String(l.id)}>{l.userName} — {l.department}</SelectItem>)}</SelectContent>
               </Select>
+              {entryErrors.lecturerId && <p className="text-xs text-red-500 mt-1">{entryErrors.lecturerId}</p>}
             </div>
             <div>
-              <Label>Venue</Label>
-              <Select value={entryForm.venueId} onValueChange={v => setEntryForm(f => ({ ...f, venueId: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select venue" /></SelectTrigger>
+              <Label>Venue <span className="text-red-500">*</span></Label>
+              <Select value={entryForm.venueId} onValueChange={v => { setEntryForm(f => ({ ...f, venueId: v })); setEntryErrors(e => { const n = { ...e }; delete n.venueId; return n; }); }}>
+                <SelectTrigger className={entryErrors.venueId ? "border-red-400" : ""}><SelectValue placeholder="Select venue" /></SelectTrigger>
                 <SelectContent>{venues.map((v: any) => <SelectItem key={v.id} value={String(v.id)}>{v.name} (cap: {v.capacity})</SelectItem>)}</SelectContent>
               </Select>
+              {entryErrors.venueId && <p className="text-xs text-red-500 mt-1">{entryErrors.venueId}</p>}
             </div>
             <div>
-              <Label>Day</Label>
-              <Select value={entryForm.dayOfWeek} onValueChange={v => setEntryForm(f => ({ ...f, dayOfWeek: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select day" /></SelectTrigger>
+              <Label>Day <span className="text-red-500">*</span></Label>
+              <Select value={entryForm.dayOfWeek} onValueChange={v => { setEntryForm(f => ({ ...f, dayOfWeek: v })); setEntryErrors(e => { const n = { ...e }; delete n.dayOfWeek; return n; }); }}>
+                <SelectTrigger className={entryErrors.dayOfWeek ? "border-red-400" : ""}><SelectValue placeholder="Select day" /></SelectTrigger>
                 <SelectContent>{DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
               </Select>
+              {entryErrors.dayOfWeek && <p className="text-xs text-red-500 mt-1">{entryErrors.dayOfWeek}</p>}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Start Time</Label>
-                <Select value={entryForm.startTime} onValueChange={v => setEntryForm(f => ({ ...f, startTime: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Start" /></SelectTrigger>
+                <Label>Start Time <span className="text-red-500">*</span></Label>
+                <Select value={entryForm.startTime} onValueChange={v => { setEntryForm(f => ({ ...f, startTime: v })); setEntryErrors(e => { const n = { ...e }; delete n.startTime; return n; }); }}>
+                  <SelectTrigger className={entryErrors.startTime ? "border-red-400" : ""}><SelectValue placeholder="Start" /></SelectTrigger>
                   <SelectContent>{TIME_SLOTS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
+                {entryErrors.startTime && <p className="text-xs text-red-500 mt-1">{entryErrors.startTime}</p>}
               </div>
               <div>
-                <Label>End Time</Label>
-                <Select value={entryForm.endTime} onValueChange={v => setEntryForm(f => ({ ...f, endTime: v }))}>
-                  <SelectTrigger><SelectValue placeholder="End" /></SelectTrigger>
+                <Label>End Time <span className="text-red-500">*</span></Label>
+                <Select value={entryForm.endTime} onValueChange={v => { setEntryForm(f => ({ ...f, endTime: v })); setEntryErrors(e => { const n = { ...e }; delete n.endTime; return n; }); }}>
+                  <SelectTrigger className={entryErrors.endTime ? "border-red-400" : ""}><SelectValue placeholder="End" /></SelectTrigger>
                   <SelectContent>{TIME_SLOTS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
+                {entryErrors.endTime && <p className="text-xs text-red-500 mt-1">{entryErrors.endTime}</p>}
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEntryOpen(false)}>Cancel</Button>
-            <Button onClick={() => createEntryMut.mutate(entryForm)} disabled={createEntryMut.isPending}>Add Entry</Button>
+            <Button variant="outline" onClick={() => { setEntryOpen(false); setEntryErrors({}); }}>Cancel</Button>
+            <Button onClick={() => {
+              const errs = validateRequired({
+                courseId:   { value: entryForm.courseId,   label: "Course" },
+                lecturerId: { value: entryForm.lecturerId, label: "Lecturer" },
+                venueId:    { value: entryForm.venueId,    label: "Venue" },
+                dayOfWeek:  { value: entryForm.dayOfWeek,  label: "Day" },
+                startTime:  { value: entryForm.startTime,  label: "Start time" },
+                endTime:    { value: entryForm.endTime,    label: "End time" },
+              });
+              if (hasErrors(errs)) { setEntryErrors(errs); return; }
+              createEntryMut.mutate(entryForm);
+            }} disabled={createEntryMut.isPending}>Add Entry</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -3,6 +3,7 @@ import { Sidebar } from "./sidebar";
 import { TopHeader } from "./top-header";
 import { useAuth } from "@/contexts/AuthContext";
 import { Redirect } from "wouter";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export function AppLayout({ children, requireAuth = true }: { children: ReactNode; requireAuth?: boolean }) {
   const { user, isLoading } = useAuth();
@@ -34,7 +35,9 @@ export function AppLayout({ children, requireAuth = true }: { children: ReactNod
         <TopHeader />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-6xl mx-auto">
-            {children}
+            <ErrorBoundary resetKey={typeof window !== "undefined" ? window.location.pathname : ""}>
+              {children}
+            </ErrorBoundary>
           </div>
         </main>
       </div>
