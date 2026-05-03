@@ -1,0 +1,125 @@
+PHASE 50: Convert Replit-Based Project to Standard Production Architecture
+
+OBJECTIVE:
+Restructure the entire MAAUN University Portal into a standard full-stack project that can be deployed on Railway, Render, or VPS environments.
+
+CRITICAL RULES:
+- DO NOT change business logic
+- DO NOT modify database schema
+- DO NOT break existing API routes
+- ONLY reorganize structure and configs
+
+--------------------------------------------------
+1. PROJECT SPLIT
+--------------------------------------------------
+
+Separate into:
+
+/backend  → existing API server
+/frontend → existing React app
+
+Move files accordingly while preserving imports.
+
+--------------------------------------------------
+2. BACKEND STANDARDIZATION
+--------------------------------------------------
+
+Ensure backend has:
+
+- package.json (independent)
+- entry file (server.ts or index.ts)
+- explicit PORT usage (process.env.PORT)
+- CORS configured for frontend domain
+- .env support (dotenv)
+
+Update:
+
+- remove Replit-specific code
+- remove REPLIT_DOMAINS fallback logic
+- use APP_URL normally
+
+--------------------------------------------------
+3. FRONTEND STANDARDIZATION
+--------------------------------------------------
+
+Ensure:
+
+- Vite build outputs to /dist
+- API base URL uses:
+  import.meta.env.VITE_API_URL
+
+Remove:
+
+- any hardcoded relative API paths (/api)
+- any Replit-specific assumptions
+
+--------------------------------------------------
+4. ENVIRONMENT VARIABLES
+
+Create:
+
+backend/.env.example
+frontend/.env.example
+
+Include:
+
+Backend:
+- PORT
+- DATABASE_URL
+- JWT_SECRET
+- PAYSTACK_SECRET_KEY
+
+Frontend:
+- VITE_API_URL
+
+--------------------------------------------------
+5. DATABASE COMPATIBILITY
+
+Keep PostgreSQL (DO NOT convert to MySQL now)
+
+Ensure:
+
+- DATABASE_URL works with Railway/Render
+- migrations run via script
+
+--------------------------------------------------
+6. START SCRIPTS
+
+Backend:
+- npm run dev
+- npm run build
+- npm start
+
+Frontend:
+- npm run dev
+- npm run build
+- npm run preview
+
+--------------------------------------------------
+7. OPTIONAL (RECOMMENDED)
+
+Add docker-compose:
+
+- backend
+- frontend
+- postgres
+
+--------------------------------------------------
+8. FINAL OUTPUT
+
+Return:
+
+- new folder structure
+- updated package.json files
+- run instructions:
+  - local dev
+  - production build
+  - deployment notes (Railway/Render)
+
+--------------------------------------------------
+END GOAL:
+
+Project runs locally AND can be deployed independently:
+- frontend → static host (Vercel/Netlify)
+- backend → Railway/Render
+- database → managed PostgreSQL

@@ -130,6 +130,70 @@ users, students, lecturers, courses, enrollments, timetable, results, academic_s
 - Admin: evaluate all students, approve/reject applications, admin override (logged)
 - Notifications on approval/rejection
 
+## Phase 50: Standard Deployment Structure (Railway / Render / VPS)
+
+Two self-contained directories added alongside the Replit monorepo. The Replit deployment (artifacts/) remains unchanged and fully functional.
+
+### `backend/` — Standalone Express API
+- All business logic copied from `artifacts/api-server/src/`
+- `lib/db/src/` inlined as `backend/src/db/` (Drizzle + 21 schema files)
+- `lib/api-zod/src/` inlined as `backend/src/api-zod/` (generated Zod schemas)
+- esbuild alias map: `@workspace/db` → `src/db`, `@workspace/api-zod` → `src/api-zod`
+- `dotenv/config` loaded at entry — reads `backend/.env`
+- `PORT` defaults to 3000 (no longer fatal if unset)
+- CORS: open in dev; restrict to `FRONTEND_URL` in prod
+- Paystack callback uses `APP_URL` (no REPLIT_DOMAINS fallback)
+- `npm run build` → `dist/index.mjs` (fully bundled single file)
+- `npm run migrate` runs drizzle-kit push against `DATABASE_URL`
+- `backend/.env.example` documents all required vars: `PORT`, `DATABASE_URL`, `SESSION_SECRET`, `PAYSTACK_SECRET_KEY`, `APP_URL`, `FRONTEND_URL`
+- `backend/Dockerfile` — multi-stage, Node 22 Alpine
+
+### `frontend/` — Standalone React / Vite SPA
+- All source copied from `artifacts/university-portal/src/`
+- `lib/api-client-react/src/` inlined as `frontend/src/lib/api-client/`
+- Vite alias: `@workspace/api-client-react` → `src/lib/api-client`
+- `VITE_API_URL` env var sets API base URL (empty → relative, i.e. same-origin)
+- `main.tsx` calls `setBaseUrl(import.meta.env.VITE_API_URL ?? "")`
+- No `@replit/` plugins in this config
+- `npm run build` → `frontend/dist/` static files (Vercel/Netlify/Nginx ready)
+- `frontend/.env.example` documents `VITE_API_URL`
+- `frontend/Dockerfile` — multi-stage, builds to nginx:alpine serving `dist/`
+
+### `docker-compose.yml` (root)
+- `postgres:16-alpine` with health-check
+- `backend` service (depends on postgres healthy)
+- `frontend` nginx service (depends on backend)
+- All secrets via `.env` at root (see `docker-compose.yml` env refs)
+
+### Run Instructions
+
+**Local dev (standalone)**:
+```bash
+# Backend
+cd backend && cp .env.example .env  # edit DATABASE_URL etc.
+npm install && npm run build && npm start
+
+# Frontend (new terminal)
+cd frontend && cp .env.example .env  # set VITE_API_URL=http://localhost:3000
+npm install && npm run dev
+```
+
+**Production build**:
+```bash
+cd backend && npm install && npm run build   # → dist/index.mjs
+cd frontend && npm install && npm run build  # → dist/
+```
+
+**Docker Compose (full stack)**:
+```bash
+cp docker-compose.yml .env.docker  # fill in JWT_SECRET etc.
+docker compose up --build
+```
+
+**Railway** (backend): Deploy `backend/` folder, set env vars in Railway dashboard.
+**Vercel / Netlify** (frontend): Deploy `frontend/` folder, set `VITE_API_URL` build var.
+**Render**: Backend → Web Service (root `backend/`). Frontend → Static Site (root `frontend/`).
+
 ## API Routes (artifacts/api-server/src/routes)
 
 | File | Prefix | Notes |
