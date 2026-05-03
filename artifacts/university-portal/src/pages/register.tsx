@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getDashboardRoute } from "@/lib/role-utils";
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 // Base schema (no refine) so we can merge without ZodEffects issues
@@ -80,10 +81,13 @@ export default function Register() {
   const registerMutation = useRegister({
     mutation: {
       onSuccess: (data) => {
+        const role  = (data.user.role ?? "").toLowerCase().trim();
+        const route = getDashboardRoute(role);
+        console.log("[MAAUN] ROLE:", role, "| REDIRECTING TO:", route);
         toast.success("Account created!", { description: "Welcome to MAAUN Portal." });
         setTimeout(() => {
           login(data.token);
-          setLocation(`/${data.user.role}/dashboard`);
+          setLocation(route);
         }, 600);
       },
       onError: (error: any) => {

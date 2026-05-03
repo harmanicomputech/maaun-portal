@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { AppLayout } from "@/components/layout/app-layout";
 import NotFound from "@/pages/not-found";
+import { useAuth } from "@/contexts/AuthContext";
+import { getDashboardRoute } from "@/lib/role-utils";
 
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -55,7 +57,14 @@ import AdminWelfare from "@/pages/admin/welfare";
 import AdminUserManagement from "@/pages/admin/user-management";
 import AdminAnnouncements from "@/pages/admin/announcements";
 import AnnouncementsPage from "@/pages/announcements";
+
+import CounsellorDashboard from "@/pages/counsellor/dashboard";
 import CounsellorWelfare from "@/pages/counsellor/welfare";
+
+import BursarDashboard from "@/pages/bursar/dashboard";
+import RegistrarDashboard from "@/pages/registrar/dashboard";
+import HodDashboard from "@/pages/hod/dashboard";
+import DeanDashboard from "@/pages/dean/dashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,17 +72,24 @@ const queryClient = new QueryClient({
   },
 });
 
+/** Root "/" — redirect authenticated users to their role dashboard, unauthenticated to /login */
+function RootRedirect() {
+  const { user, isLoading } = useAuth();
+  if (isLoading) return null;
+  if (user) return <Redirect to={getDashboardRoute(user.role)} />;
+  return <Redirect to="/login" />;
+}
+
 function Router() {
   return (
     <Switch>
-      {/* Public routes */}
+      {/* ── Public (no auth) ─────────────────────────────────────────── */}
       <Route path="/verify/transcript/:reference" component={VerifyTranscript} />
       <Route path="/verify/receipt/:reference" component={VerifyReceipt} />
-
       <Route path="/login"><AppLayout requireAuth={false}><Login /></AppLayout></Route>
       <Route path="/register"><AppLayout requireAuth={false}><Register /></AppLayout></Route>
 
-      {/* Student Routes */}
+      {/* ── Student ──────────────────────────────────────────────────── */}
       <Route path="/student/dashboard"><AppLayout><StudentDashboard /></AppLayout></Route>
       <Route path="/student/courses"><AppLayout><StudentCourses /></AppLayout></Route>
       <Route path="/student/enrollments"><AppLayout><StudentEnrollments /></AppLayout></Route>
@@ -89,7 +105,7 @@ function Router() {
       <Route path="/student/disciplinary"><AppLayout><StudentDisciplinary /></AppLayout></Route>
       <Route path="/student/welfare"><AppLayout><StudentWelfare /></AppLayout></Route>
 
-      {/* Lecturer Routes */}
+      {/* ── Lecturer ─────────────────────────────────────────────────── */}
       <Route path="/lecturer/dashboard"><AppLayout><LecturerDashboard /></AppLayout></Route>
       <Route path="/lecturer/courses"><AppLayout><LecturerCourses /></AppLayout></Route>
       <Route path="/lecturer/students"><AppLayout><LecturerStudents /></AppLayout></Route>
@@ -97,7 +113,7 @@ function Router() {
       <Route path="/lecturer/transcript"><AppLayout><LecturerTranscript /></AppLayout></Route>
       <Route path="/lecturer/timetable"><AppLayout><LecturerTimetable /></AppLayout></Route>
 
-      {/* Admin Routes */}
+      {/* ── Admin + Super Admin ───────────────────────────────────────── */}
       <Route path="/admin/dashboard"><AppLayout><AdminDashboard /></AppLayout></Route>
       <Route path="/admin/courses"><AppLayout><AdminCourses /></AppLayout></Route>
       <Route path="/admin/students"><AppLayout><AdminStudents /></AppLayout></Route>
@@ -115,39 +131,41 @@ function Router() {
       <Route path="/admin/hostel"><AppLayout><AdminHostel /></AppLayout></Route>
       <Route path="/admin/disciplinary"><AppLayout><AdminDisciplinary /></AppLayout></Route>
       <Route path="/admin/welfare"><AppLayout><AdminWelfare /></AppLayout></Route>
-
       <Route path="/admin/user-management"><AppLayout><AdminUserManagement /></AppLayout></Route>
       <Route path="/admin/announcements"><AppLayout><AdminAnnouncements /></AppLayout></Route>
 
-      {/* Shared Announcements — all roles */}
-      <Route path="/announcements"><AppLayout><AnnouncementsPage /></AppLayout></Route>
-
-      {/* Counsellor Routes */}
+      {/* ── Counsellor ───────────────────────────────────────────────── */}
+      <Route path="/counsellor/dashboard"><AppLayout><CounsellorDashboard /></AppLayout></Route>
       <Route path="/counsellor/welfare"><AppLayout><CounsellorWelfare /></AppLayout></Route>
 
-      {/* Bursar — finance pages shared with admin */}
+      {/* ── Bursar ───────────────────────────────────────────────────── */}
+      <Route path="/bursar/dashboard"><AppLayout><BursarDashboard /></AppLayout></Route>
       <Route path="/bursar/finance"><AppLayout><AdminFinance /></AppLayout></Route>
       <Route path="/bursar/payments"><AppLayout><AdminPayments /></AppLayout></Route>
 
-      {/* Registrar — results & graduation shared with admin */}
+      {/* ── Registrar ────────────────────────────────────────────────── */}
+      <Route path="/registrar/dashboard"><AppLayout><RegistrarDashboard /></AppLayout></Route>
       <Route path="/registrar/results"><AppLayout><AdminResults /></AppLayout></Route>
       <Route path="/registrar/graduation"><AppLayout><AdminGraduation /></AppLayout></Route>
       <Route path="/registrar/transcripts"><AppLayout><AdminTranscripts /></AppLayout></Route>
 
-      {/* HoD — courses + results */}
+      {/* ── HoD ──────────────────────────────────────────────────────── */}
+      <Route path="/hod/dashboard"><AppLayout><HodDashboard /></AppLayout></Route>
       <Route path="/hod/courses"><AppLayout><AdminCourses /></AppLayout></Route>
       <Route path="/hod/timetable"><AppLayout><AdminTimetable /></AppLayout></Route>
       <Route path="/hod/results"><AppLayout><AdminResults /></AppLayout></Route>
 
-      {/* Dean — graduation + results */}
+      {/* ── Dean ─────────────────────────────────────────────────────── */}
+      <Route path="/dean/dashboard"><AppLayout><DeanDashboard /></AppLayout></Route>
       <Route path="/dean/results"><AppLayout><AdminResults /></AppLayout></Route>
       <Route path="/dean/graduation"><AppLayout><AdminGraduation /></AppLayout></Route>
 
-      <Route path="/">
-        <AppLayout>
-          <div className="flex items-center justify-center h-full">Redirecting...</div>
-        </AppLayout>
-      </Route>
+      {/* ── Shared (all authenticated roles) ─────────────────────────── */}
+      <Route path="/announcements"><AppLayout><AnnouncementsPage /></AppLayout></Route>
+
+      {/* ── Root redirect ────────────────────────────────────────────── */}
+      <Route path="/"><RootRedirect /></Route>
+
       <Route component={NotFound} />
     </Switch>
   );

@@ -32,27 +32,32 @@ const ROLE_LINKS: Record<string, { href: string; label: string; icon: any }[]> =
     { href: "/student/profile",           label: "My Profile",         icon: UserIcon },
   ],
   counsellor: [
+    { href: "/counsellor/dashboard",      label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/counsellor/welfare",        label: "My Assigned Cases",  icon: Heart },
   ],
   bursar: [
+    { href: "/bursar/dashboard",          label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/bursar/finance",            label: "Finance & Receipts", icon: Receipt },
     { href: "/bursar/payments",           label: "Payments & Fees",    icon: DollarSign },
   ],
   registrar: [
+    { href: "/registrar/dashboard",       label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/registrar/results",         label: "All Results",        icon: FileText },
     { href: "/registrar/graduation",      label: "Graduation",         icon: GraduationCap },
     { href: "/registrar/transcripts",     label: "Transcripts",        icon: ScrollText },
   ],
   hod: [
+    { href: "/hod/dashboard",             label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/hod/courses",               label: "Manage Courses",     icon: BookOpen },
     { href: "/hod/timetable",             label: "Timetable",          icon: Calendar },
     { href: "/hod/results",               label: "All Results",        icon: FileText },
   ],
   dean: [
+    { href: "/dean/dashboard",            label: "Dashboard",          icon: LayoutDashboard },
     { href: "/announcements",             label: "Announcements",      icon: Megaphone },
     { href: "/dean/results",              label: "All Results",        icon: FileText },
     { href: "/dean/graduation",           label: "Graduation",         icon: GraduationCap },
@@ -131,7 +136,7 @@ export function Sidebar() {
 
   const links = ROLE_LINKS[user.role as keyof typeof ROLE_LINKS] || [];
   const roleDisplay = ROLE_DISPLAY[user.role] ?? { label: user.role, color: "text-primary-foreground/70" };
-  const isSuperAdmin = user.role === "super_admin";
+  const isSuperAdmin = (user.role as string) === "super_admin";
 
   const handleLogout = () => {
     setShowLogoutModal(false);

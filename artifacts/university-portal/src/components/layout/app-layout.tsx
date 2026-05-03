@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Redirect, useLocation } from "wouter";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { GraduationCap } from "lucide-react";
+import { getDashboardRoute, getAllowedRoles } from "@/lib/role-utils";
 
 function FullPageSpinner() {
   return (
@@ -27,11 +28,26 @@ export function AppLayout({ children, requireAuth = true }: { children: ReactNod
 
   if (isLoading) return <FullPageSpinner />;
 
+  // Unauthenticated user hitting a protected route → login
   if (requireAuth && !user) return <Redirect to="/login" />;
-  if (!requireAuth && user) return <Redirect to={`/${user.role}/dashboard`} />;
 
+  // Authenticated user hitting a public-only route (login/register) → their dashboard
+  if (!requireAuth && user) return <Redirect to={getDashboardRoute(user.role)} />;
+
+  // Public route (no auth required, no user) → render normally
   if (!requireAuth) {
     return <div className="min-h-screen bg-background">{children}</div>;
+  }
+
+  // ── Role guard ────────────────────────────────────────────────────────────
+  // If the current path is restricted to specific roles and the logged-in user
+  // doesn't have one of those roles, silently redirect them to their own dashboard.
+  if (user) {
+    const allowedRoles = getAllowedRoles(location);
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+      console.warn(`[MAAUN] Role "${user.role}" attempted "${location}" → redirecting to ${getDashboardRoute(user.role)}`);
+      return <Redirect to={getDashboardRoute(user.role)} />;
+    }
   }
 
   return (

@@ -271,21 +271,21 @@ export default function AdminGraduation() {
                           {!c ? <span className="text-xs text-muted-foreground">—</span> : (
                             c.academicStatus === "passed"
                               ? <CheckCircle className="w-4 h-4 text-green-500" />
-                              : <XCircle className="w-4 h-4 text-red-500" title={c.academicRemarks ?? ""} />
+                              : <XCircle className="w-4 h-4 text-red-500" aria-label={c.academicRemarks ?? ""} />
                           )}
                         </td>
                         <td className="px-3 py-3">
                           {!c ? <span className="text-xs text-muted-foreground">—</span> : (
                             c.financialStatus === "cleared"
                               ? <CheckCircle className="w-4 h-4 text-green-500" />
-                              : <XCircle className="w-4 h-4 text-red-500" title={c.financialRemarks ?? ""} />
+                              : <XCircle className="w-4 h-4 text-red-500" aria-label={c.financialRemarks ?? ""} />
                           )}
                         </td>
                         <td className="px-3 py-3">
                           {!c ? <span className="text-xs text-muted-foreground">—</span> : (
                             c.adminStatus === "cleared"
                               ? <CheckCircle className="w-4 h-4 text-green-500" />
-                              : <XCircle className="w-4 h-4 text-red-500" title={c.adminRemarks ?? ""} />
+                              : <XCircle className="w-4 h-4 text-red-500" aria-label={c.adminRemarks ?? ""} />
                           )}
                         </td>
                         <td className="px-3 py-3">

@@ -130,7 +130,7 @@ export default function StudentTimetable() {
                   <>
                     <div key={`t-${hour}`} className="bg-muted/60 text-xs text-muted-foreground px-3 py-2 font-mono flex items-start pt-2">{hour}</div>
                     {DAYS.map(day => {
-                      const slotEntries = byDayAndSlot(day, hour).filter(e => startsAt(e, hour));
+                      const slotEntries = byDayAndSlot(day, hour).filter((e: any) => startsAt(e, hour));
                       return (
                         <div key={`${day}-${hour}`} className="bg-background min-h-[52px] p-1 relative">
                           {slotEntries.map((e: any) => {

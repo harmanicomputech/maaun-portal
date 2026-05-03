@@ -43,7 +43,7 @@ export default function LecturerResults() {
   const { data: students = [] } = useListStudents();
   const { data: results = [], isLoading } = useListResults(
     selectedCourseId ? { courseId: parseInt(selectedCourseId), academicYear: ACADEMIC_YEAR } : undefined,
-    { query: { enabled: !!selectedCourseId } }
+    { query: { enabled: !!selectedCourseId, queryKey: [] } as any }
   );
 
   const submitMutation = useSubmitResult({

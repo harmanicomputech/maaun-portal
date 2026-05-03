@@ -40,7 +40,7 @@ export default function AdminResults() {
   const { data: courses = [] } = useListCourses();
   const { data: results = [], isLoading } = useListResults(
     selectedStudentId ? { studentId: parseInt(selectedStudentId) } : undefined,
-    { query: { enabled: !!selectedStudentId } }
+    { query: { enabled: !!selectedStudentId, queryKey: [] } as any }
   );
 
   const submitMutation = useSubmitResult({

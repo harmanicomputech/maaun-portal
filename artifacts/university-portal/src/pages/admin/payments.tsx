@@ -49,8 +49,8 @@ export default function AdminPayments() {
   const openNew = () => { setEditingFee(null); setForm({ name: "", amount: "", department: "", level: "", description: "" }); setDialogOpen(true); };
   const openEdit = (fee: any) => { setEditingFee(fee); setForm({ name: fee.name, amount: String(fee.amount), department: fee.department || "", level: fee.level || "", description: fee.description || "" }); setDialogOpen(true); };
 
-  const handleSave = async () => {
-    if (!form.name || !form.amount) return toast({ title: "Name and amount are required", variant: "destructive" });
+  const handleSave = async (): Promise<void> => {
+    if (!form.name || !form.amount) { toast({ title: "Name and amount are required", variant: "destructive" }); return; }
     setSaving(true);
     try {
       if (editingFee) await axios.put(`${BASE()}/api/fees/${editingFee.id}`, form, { headers: authHeaders() });

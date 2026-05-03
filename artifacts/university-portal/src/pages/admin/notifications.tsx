@@ -37,8 +37,8 @@ export default function AdminNotifications() {
     },
   });
 
-  const handleBroadcast = async () => {
-    if (!form.title || !form.message) return toast({ title: "Title and message are required", variant: "destructive" });
+  const handleBroadcast = async (): Promise<void> => {
+    if (!form.title || !form.message) { toast({ title: "Title and message are required", variant: "destructive" }); return; }
     setSending(true);
     try {
       const res = await axios.post(`${BASE()}/api/notifications/broadcast`, form, { headers: authHeaders() });

@@ -1,0 +1,129 @@
+PHASE 40: Role-Based Dashboard Routing Fix (Critical Auth Stabilization)
+
+OBJECTIVE:
+Fix inconsistent post-login redirection so that EVERY user role is always automatically routed to the correct dashboard after login without manual URL changes.
+
+Roles:
+- student
+- lecturer
+- counsellor
+- bursar
+- registrar
+- hod
+- dean
+- admin
+- super_admin
+
+--------------------------------------------------
+1. SINGLE SOURCE OF TRUTH (CRITICAL)
+--------------------------------------------------
+
+Create a centralized role-to-route map:
+
+ROLE_REDIRECT_MAP:
+
+- student → /student/dashboard
+- lecturer → /lecturer/dashboard
+- counsellor → /counsellor/dashboard
+- bursar → /bursar/dashboard
+- registrar → /registrar/dashboard
+- hod → /hod/dashboard
+- dean → /dean/dashboard
+- admin → /admin/dashboard
+- super_admin → /admin/dashboard
+
+RULE:
+All login redirects MUST use this map only.
+
+No hardcoded routes anywhere else in the app.
+
+--------------------------------------------------
+2. LOGIN REDIRECT FIX
+--------------------------------------------------
+
+After successful authentication:
+
+- read user.role from response
+- resolve route from ROLE_REDIRECT_MAP
+- navigate immediately
+
+Add fallback:
+
+- unknown role → /login (with error toast)
+
+--------------------------------------------------
+3. ROUTE GUARD ALIGNMENT
+--------------------------------------------------
+
+Ensure frontend route guards:
+
+- match role before rendering dashboard
+- block unauthorized dashboard access
+- redirect unauthorized access back to correct role dashboard
+
+Example:
+student trying /admin/dashboard → redirect to /student/dashboard
+
+--------------------------------------------------
+4. BACKEND ROLE CONSISTENCY CHECK
+--------------------------------------------------
+
+Verify API login response always returns:
+
+- user.id
+- user.role (single source, lowercase, trimmed)
+- token
+
+Normalize role casing:
+- convert to lowercase before routing
+
+--------------------------------------------------
+5. FIX BROKEN OR MISSING ROUTES
+--------------------------------------------------
+
+Scan all routes and ensure:
+
+- every role has a defined /dashboard route
+- no legacy routes like /superadmin/dashboard remain
+- no duplicate or orphan routes exist
+
+--------------------------------------------------
+6. HARDEN NAVIGATION SYSTEM
+--------------------------------------------------
+
+Create helper function:
+
+getDashboardRoute(role: string): string
+
+Use it everywhere:
+- login redirect
+- navbar redirect
+- session restore redirect
+- logout fallback redirect
+
+--------------------------------------------------
+7. SESSION RESTORE FIX
+--------------------------------------------------
+
+On page refresh:
+
+- read stored session
+- auto-redirect to correct dashboard
+- prevent landing on wrong role page
+
+--------------------------------------------------
+8. DEBUGGING OUTPUT (TEMP)
+--------------------------------------------------
+
+Log on login:
+
+console.log("ROLE:", user.role)
+console.log("REDIRECTING TO:", route)
+
+--------------------------------------------------
+END RESULT:
+
+- every role always lands on correct dashboard
+- no manual URL fixing required
+- consistent routing across login, refresh, and navigation
+- zero broken dashboard access

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getDashboardRoute } from "@/lib/role-utils";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 const loginSchema = z.object({
@@ -80,10 +81,13 @@ export default function Login() {
   const loginMutation = useLogin({
     mutation: {
       onSuccess: (data) => {
+        const role  = (data.user.role ?? "").toLowerCase().trim();
+        const route = getDashboardRoute(role);
+        console.log("[MAAUN] ROLE:", role, "| REDIRECTING TO:", route);
         toast.success("Welcome back!", { description: "Redirecting to your dashboard…" });
         setTimeout(() => {
           login(data.token);
-          setLocation(`/${data.user.role}/dashboard`);
+          setLocation(route);
         }, 600);
       },
       onError: (error: any) => {

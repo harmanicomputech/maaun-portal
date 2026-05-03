@@ -25,7 +25,7 @@ export default function StudentEnrollments() {
 
   const { data: enrollments = [], isLoading } = useListEnrollments(
     studentId ? { studentId } : undefined,
-    { query: { enabled: !!studentId } }
+    { query: { enabled: !!studentId, queryKey: [] } as any }
   );
 
   const dropMutation = useDropCourse({

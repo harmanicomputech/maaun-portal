@@ -30,11 +30,11 @@ export default function StudentResults() {
 
   const { data: results = [], isLoading } = useListResults(
     studentId ? { studentId } : undefined,
-    { query: { enabled: !!studentId } }
+    { query: { enabled: !!studentId, queryKey: [] } as any }
   );
   const { data: cgpaData, isLoading: cgpaLoading } = useGetStudentCgpa(
     studentId!,
-    { query: { enabled: !!studentId } }
+    { query: { enabled: !!studentId, queryKey: [] } as any }
   );
 
   const failedCourses = results.filter(r => r.grade === "F");

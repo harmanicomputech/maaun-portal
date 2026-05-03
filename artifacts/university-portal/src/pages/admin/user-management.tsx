@@ -43,7 +43,7 @@ export default function AdminUserManagement() {
   const { toast } = useToast();
   const qc = useQueryClient();
   const { user: currentUser } = useAuth();
-  const isSuperAdmin = currentUser?.role === "super_admin";
+  const isSuperAdmin = (currentUser?.role as string) === "super_admin";
 
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
