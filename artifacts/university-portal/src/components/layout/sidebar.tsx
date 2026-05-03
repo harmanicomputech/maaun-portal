@@ -156,14 +156,17 @@ export function Sidebar() {
           return (
             <Link key={link.href} href={link.href}>
               <div
-                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors cursor-pointer ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 cursor-pointer ${
                   isActive
-                    ? "bg-white text-primary font-medium shadow-sm"
-                    : "text-primary-foreground/85 hover:bg-primary-foreground/10 hover:text-white"
+                    ? "bg-white text-primary font-semibold shadow-sm"
+                    : "text-primary-foreground/80 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-primary" : ""}`} />
-                <span className="text-sm">{link.label}</span>
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-primary" : "opacity-80"}`} />
+                <span className="text-[13px] leading-tight">{link.label}</span>
+                {isActive && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                )}
               </div>
             </Link>
           );

@@ -51,7 +51,7 @@ export function TopHeader() {
     .toUpperCase() ?? "?";
 
   return (
-    <header className="h-16 border-b bg-white flex items-center justify-between px-4 md:px-6 shrink-0">
+    <header className="h-16 border-b bg-card/90 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-10">
       {/* Left: mobile menu + page title */}
       <div className="flex items-center gap-3">
         <Sheet>

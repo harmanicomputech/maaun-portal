@@ -1,0 +1,156 @@
+PHASE 37: UI/UX Polish, Animation System & Layout Stability Fix
+
+OBJECTIVE:
+Upgrade the entire MAAUN University Portal UI to a modern, polished, production-grade design system while preserving all existing functionality.
+
+DO NOT change backend logic or API behavior.
+ONLY improve UI, layout, spacing, and animations.
+
+--------------------------------------------------
+1. GLOBAL DESIGN SYSTEM STANDARDIZATION
+--------------------------------------------------
+
+Enforce across entire app:
+
+- Primary color: #0B3CFE
+- Font: Inter (or Poppins fallback)
+- Consistent spacing scale (8px grid system)
+- Uniform card radius (12–16px)
+- Soft shadows (no harsh borders)
+
+--------------------------------------------------
+2. LAYOUT FIXES (CRITICAL)
+--------------------------------------------------
+
+Fix all:
+
+- overlapping containers
+- scroll overflow issues
+- dashboard grid misalignment
+- sidebar content collision
+- mobile responsiveness issues
+
+Rules:
+
+- No element should overflow its parent container
+- Use flex-wrap / grid properly
+- Ensure all dashboards are fully responsive
+
+--------------------------------------------------
+3. CARD SYSTEM STANDARDIZATION
+--------------------------------------------------
+
+Convert all UI blocks into consistent cards:
+
+- shadow-sm default
+- hover: shadow-md + slight lift (-translate-y-1)
+- smooth transition (200–300ms)
+
+--------------------------------------------------
+4. ANIMATION LAYER (SUBTLE ONLY)
+--------------------------------------------------
+
+Add Framer Motion (or equivalent):
+
+Apply to:
+
+- page transitions (fade + slide up)
+- modal open/close (scale + fade)
+- card hover effects (lift + shadow)
+- button interactions (slight scale down on click)
+
+Rules:
+- Keep animations subtle (no excessive motion)
+- Must not slow down UX
+
+--------------------------------------------------
+5. DASHBOARD IMPROVEMENTS
+--------------------------------------------------
+
+All dashboards (student, admin, lecturer, etc.):
+
+- improve spacing between sections
+- align stat cards evenly
+- ensure consistent grid layout
+- fix misaligned headings
+- improve visual hierarchy (titles > content > actions)
+
+--------------------------------------------------
+6. TABLE IMPROVEMENTS
+--------------------------------------------------
+
+For all tables:
+
+- add row hover highlight
+- improve padding and readability
+- sticky headers where needed
+- better empty states (icons + message)
+
+--------------------------------------------------
+7. FORM IMPROVEMENTS
+--------------------------------------------------
+
+- consistent input spacing
+- grouped form sections
+- better label hierarchy
+- improved validation message styling
+- disable submit button when loading
+
+--------------------------------------------------
+8. MODAL & DIALOG FIXES
+--------------------------------------------------
+
+- center modals properly
+- prevent background scroll
+- fix overflow issues
+- add smooth open/close animation
+
+--------------------------------------------------
+9. LOADING STATES
+--------------------------------------------------
+
+Replace all basic loaders with:
+
+- skeleton loaders for cards
+- shimmer effect for tables
+- smooth loading transitions
+
+--------------------------------------------------
+10. NOTIFICATION UX IMPROVEMENT
+--------------------------------------------------
+
+- animate badge updates
+- smooth dropdown transitions
+- highlight unread items subtly
+- avoid layout shift when notifications load
+
+--------------------------------------------------
+11. RESPONSIVENESS FIXES
+--------------------------------------------------
+
+Ensure:
+
+- no horizontal scrolling on mobile
+- sidebar collapses properly
+- dashboards stack correctly
+- tables scroll horizontally only when necessary
+
+--------------------------------------------------
+12. FINAL UI CONSISTENCY PASS
+--------------------------------------------------
+
+Scan entire app and ensure:
+
+- no broken spacing
+- no misaligned grids
+- no clipped text
+- no overlapping components
+
+--------------------------------------------------
+END RESULT:
+
+A clean, modern, production-grade university portal UI:
+- smooth animations
+- consistent layout system
+- zero overflow issues
+- professional dashboard experience
