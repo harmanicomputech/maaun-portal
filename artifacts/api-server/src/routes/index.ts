@@ -19,6 +19,7 @@ import graduationRouter from "./graduation";
 import hostelRouter from "./hostel";
 import disciplinaryRouter from "./disciplinary";
 import appealsRouter from "./appeals";
+import welfareRouter from "./welfare";
 
 const router: IRouter = Router();
 
@@ -42,5 +43,6 @@ router.use(graduationRouter);
 router.use(hostelRouter);
 router.use(disciplinaryRouter);
 router.use(appealsRouter);
+router.use(welfareRouter);
 
 export default router;

@@ -1,0 +1,153 @@
+PHASE 28: Student Welfare & Counselling System (Confidential Case Management)
+
+OBJECTIVE:
+Build a secure and privacy-focused system where students can request counselling or welfare support, and authorized staff can manage cases with strict confidentiality controls.
+
+--------------------------------------------------
+1. DATABASE DESIGN
+--------------------------------------------------
+
+Create table: welfare_cases
+- id
+- student_id
+- category (mental_health, financial_support, harassment, academic_stress, other)
+- title
+- description
+- priority (low, medium, high, urgent)
+- status (submitted, assigned, in_progress, resolved, closed)
+- is_confidential (boolean default true)
+- created_at
+
+Create table: welfare_assignments
+- id
+- case_id
+- assigned_to (admin/counsellor_id)
+- assigned_by
+- assigned_at
+
+Create table: welfare_notes
+- id
+- case_id
+- author_id
+- note (text)
+- is_private (boolean)
+- created_at
+
+--------------------------------------------------
+2. ROLE SYSTEM EXTENSION
+--------------------------------------------------
+
+Add new role:
+- counsellor
+
+Permissions:
+- counsellor: view only assigned cases
+- admin: full access
+- student: own cases only
+
+--------------------------------------------------
+3. CONFIDENTIALITY ENGINE (CRITICAL)
+
+Rules:
+- Students see ONLY their own cases
+- Counsellors see ONLY assigned cases
+- Admin sees all (but flag sensitive cases)
+
+Sensitive cases:
+- mental_health
+- harassment
+
+Must display:
+- "Confidential Case" badge
+
+--------------------------------------------------
+4. STUDENT FEATURES
+--------------------------------------------------
+
+Page: /student/welfare
+
+- Submit new request:
+  - category
+  - title
+  - description
+  - urgency level
+
+- View own cases:
+  - status timeline
+  - assigned counsellor (optional)
+  - responses (non-private notes only)
+
+--------------------------------------------------
+5. ADMIN FEATURES
+--------------------------------------------------
+
+Page: /admin/welfare
+
+- View all cases
+- Filter:
+  - category
+  - priority
+  - status
+
+- Assign case to counsellor
+- Change priority
+- Add notes (internal/private or shared)
+
+--------------------------------------------------
+6. COUNSELLOR FEATURES
+--------------------------------------------------
+
+Page: /counsellor/welfare
+
+- View assigned cases
+- Add notes
+- Update case status
+
+--------------------------------------------------
+7. NOTES SYSTEM
+
+Two types:
+- private notes (only admin/counsellor)
+- shared notes (visible to student)
+
+--------------------------------------------------
+8. NOTIFICATIONS
+
+Trigger:
+- case submitted
+- case assigned
+- status updated
+- new response added
+
+--------------------------------------------------
+9. AUDIT LOGGING
+
+Log:
+- case creation
+- assignment
+- status updates
+- note creation
+
+DO NOT log sensitive content in plain text (store minimal metadata only)
+
+--------------------------------------------------
+10. SECURITY RULES (VERY IMPORTANT)
+
+- Enforce strict authorization checks on every endpoint
+- Prevent unauthorized access by ID guessing
+- Encrypt sensitive fields (optional advanced)
+- Mask sensitive categories in logs
+
+--------------------------------------------------
+11. UI REQUIREMENTS
+
+- Calm, minimal, non-intimidating UI
+- Use soft colors (avoid aggressive red unless urgent)
+- Timeline view for case progress
+
+--------------------------------------------------
+12. BUSINESS RULES
+
+- Urgent cases must be flagged prominently
+- Admin must assign high-priority cases quickly
+- Cases can only be closed by admin or counsellor

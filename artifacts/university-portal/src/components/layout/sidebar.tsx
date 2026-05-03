@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, BookOpen, GraduationCap, FileText, Users, LogOut,
   User as UserIcon, CreditCard, Bell, CalendarDays, Activity, DollarSign,
-  Award, ScrollText, Receipt, Calendar, Home, ShieldAlert,
+  Award, ScrollText, Receipt, Calendar, Home, ShieldAlert, Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -18,10 +18,14 @@ const ROLE_LINKS = {
     { href: "/student/graduation",        label: "Graduation",         icon: GraduationCap },
     { href: "/student/hostel",            label: "Hostel",             icon: Home },
     { href: "/student/disciplinary",      label: "Disciplinary",       icon: ShieldAlert },
+    { href: "/student/welfare",           label: "Welfare & Support",  icon: Heart },
     { href: "/student/payments",          label: "Fee Payments",       icon: CreditCard },
     { href: "/student/receipts",          label: "My Receipts",        icon: Receipt },
     { href: "/student/notifications",     label: "Notifications",      icon: Bell },
     { href: "/student/profile",           label: "My Profile",         icon: UserIcon },
+  ],
+  counsellor: [
+    { href: "/counsellor/welfare", label: "My Assigned Cases", icon: Heart },
   ],
   lecturer: [
     { href: "/lecturer/dashboard",  label: "Dashboard",           icon: LayoutDashboard },
@@ -37,6 +41,7 @@ const ROLE_LINKS = {
     { href: "/admin/graduation",         label: "Graduation",         icon: GraduationCap },
     { href: "/admin/hostel",             label: "Hostel",             icon: Home },
     { href: "/admin/disciplinary",       label: "Disciplinary",       icon: ShieldAlert },
+    { href: "/admin/welfare",            label: "Student Welfare",    icon: Heart },
     { href: "/admin/courses",            label: "Manage Courses",     icon: BookOpen },
     { href: "/admin/students",           label: "Students",           icon: Users },
     { href: "/admin/lecturers",          label: "Lecturers",          icon: GraduationCap },

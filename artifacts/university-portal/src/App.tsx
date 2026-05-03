@@ -24,6 +24,7 @@ import StudentTimetable from "@/pages/student/timetable";
 import StudentGraduation from "@/pages/student/graduation";
 import StudentHostel from "@/pages/student/hostel";
 import StudentDisciplinary from "@/pages/student/disciplinary";
+import StudentWelfare from "@/pages/student/welfare";
 
 import LecturerDashboard from "@/pages/lecturer/dashboard";
 import LecturerCourses from "@/pages/lecturer/courses";
@@ -48,6 +49,8 @@ import AdminTimetable from "@/pages/admin/timetable";
 import AdminGraduation from "@/pages/admin/graduation";
 import AdminHostel from "@/pages/admin/hostel";
 import AdminDisciplinary from "@/pages/admin/disciplinary";
+import AdminWelfare from "@/pages/admin/welfare";
+import CounsellorWelfare from "@/pages/counsellor/welfare";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +82,7 @@ function Router() {
       <Route path="/student/graduation"><AppLayout><StudentGraduation /></AppLayout></Route>
       <Route path="/student/hostel"><AppLayout><StudentHostel /></AppLayout></Route>
       <Route path="/student/disciplinary"><AppLayout><StudentDisciplinary /></AppLayout></Route>
+      <Route path="/student/welfare"><AppLayout><StudentWelfare /></AppLayout></Route>
 
       {/* Lecturer Routes */}
       <Route path="/lecturer/dashboard"><AppLayout><LecturerDashboard /></AppLayout></Route>
@@ -105,6 +109,10 @@ function Router() {
       <Route path="/admin/graduation"><AppLayout><AdminGraduation /></AppLayout></Route>
       <Route path="/admin/hostel"><AppLayout><AdminHostel /></AppLayout></Route>
       <Route path="/admin/disciplinary"><AppLayout><AdminDisciplinary /></AppLayout></Route>
+      <Route path="/admin/welfare"><AppLayout><AdminWelfare /></AppLayout></Route>
+
+      {/* Counsellor Routes */}
+      <Route path="/counsellor/welfare"><AppLayout><CounsellorWelfare /></AppLayout></Route>
 
       <Route path="/">
         <AppLayout>
