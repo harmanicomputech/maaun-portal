@@ -228,10 +228,18 @@ router.post("/auth/login", async (req, res) => {
       },
       token,
     });
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    return res.status(500).json({ error: "Internal server error" });
-  }
+} catch (err) {
+  console.error("LOGIN REAL ERROR:", err);
+
+  return res.status(500).json({
+    error: "Internal server error",
+    message:
+      process.env.NODE_ENV === "production"
+        ? "Something went wrong during login."
+        : String(err),
+  });
+}
+
 });
 
 /**
