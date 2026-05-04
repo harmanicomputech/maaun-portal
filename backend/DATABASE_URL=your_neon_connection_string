@@ -1,0 +1,2 @@
+DATABASE_URL=your_neon_connection_string_here
+PAYSTACK_SECRET_KEY=your_paystack_key_here
