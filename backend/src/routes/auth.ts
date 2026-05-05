@@ -242,7 +242,4 @@ router.post("/auth/login", async (req, res) => {
 
 });
 
-/**
- * LOGOUT
- */
-router.post("
+export default router;
